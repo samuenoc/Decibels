@@ -1,39 +1,74 @@
+"use client"
+
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Music, Zap, Shield, Coins } from "lucide-react"
+import { Music, Zap, Shield, Coins, User, Mic } from "lucide-react"
 import Link from "next/link"
+import { ModeToggle } from "@/components/ui/mode-toggle"
+import { useUserMode } from "@/components/providers/user-mode-provider"
 
 export default function HomePage() {
+  const { userMode } = useUserMode()
+
   return (
     <div className="space-y-16">
       {/* Hero Section */}
       <section className="text-center space-y-8 py-16">
         <div className="space-y-4">
           <h1 className="text-6xl font-bold text-balance">
-            <span className="text-cyber-purple">Cyber</span>
-            <span className="text-cyber-pink">Beats</span>
+            <span className="text-cyber-purple">Deci</span>
+            <span className="text-cyber-pink">Bels</span>
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto text-balance">
             The future of music streaming. Decentralized, transparent, and powered by blockchain technology.
           </p>
         </div>
 
+        {/* Mode Toggle */}
+        <div className="flex justify-center">
+          <ModeToggle />
+        </div>
+
         <div className="flex gap-4 justify-center">
-          <Link href="/songs">
-            <Button size="lg" className="bg-cyber-purple hover:bg-cyber-purple/80 glow-purple">
-              <Music className="h-5 w-5 mr-2" />
-              Explore Music
-            </Button>
-          </Link>
-          <Link href="/register">
-            <Button
-              size="lg"
-              variant="outline"
-              className="border-cyber-pink text-cyber-pink hover:bg-cyber-pink hover:text-black glow-pink bg-transparent"
-            >
-              Become an Artist
-            </Button>
-          </Link>
+          {userMode === "listener" ? (
+            <>
+              <Link href="/songs">
+                <Button size="lg" className="bg-cyber-purple hover:bg-cyber-purple/80 glow-purple">
+                  <Music className="h-5 w-5 mr-2" />
+                  Explore Music
+                </Button>
+              </Link>
+              <Link href="/listener/register">
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="border-cyber-purple text-cyber-purple hover:bg-cyber-purple hover:text-black glow-purple bg-transparent"
+                >
+                  <User className="h-5 w-5 mr-2" />
+                  Join as Listener
+                </Button>
+              </Link>
+            </>
+          ) : (
+            <>
+              <Link href="/artist/upload">
+                <Button size="lg" className="bg-cyber-pink hover:bg-cyber-pink/80 glow-pink">
+                  <Mic className="h-5 w-5 mr-2" />
+                  Upload Music
+                </Button>
+              </Link>
+              <Link href="/artist/register">
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="border-cyber-pink text-cyber-pink hover:bg-cyber-pink hover:text-black glow-pink bg-transparent"
+                >
+                  <Mic className="h-5 w-5 mr-2" />
+                  Become an Artist
+                </Button>
+              </Link>
+            </>
+          )}
         </div>
       </section>
 

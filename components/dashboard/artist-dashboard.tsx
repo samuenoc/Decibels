@@ -124,7 +124,7 @@ export function ArtistDashboard() {
         </CardHeader>
         <CardContent>
           <div className="flex gap-4">
-            <Link href="/upload">
+            <Link href="/artist/upload">
               <Button className="bg-cyber-pink hover:bg-cyber-pink/80 glow-pink">
                 <Music className="h-4 w-4 mr-2" />
                 Upload New Song

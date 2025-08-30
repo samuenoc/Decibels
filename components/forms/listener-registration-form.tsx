@@ -5,23 +5,18 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { User, Mail, Lock, Music, Wallet, Mic } from "lucide-react"
+import { User, Mail, Lock, Music, Wallet } from "lucide-react"
 import { useAuth } from "@/components/auth/auth-provider"
 import { toast } from "@/hooks/use-toast"
 
-export function ArtistRegistrationForm() {
+export function ListenerRegistrationForm() {
   const { register, isWalletConnected, connectWallet } = useAuth()
   const [isLoading, setIsLoading] = useState(false)
   const [isAccountCreated, setIsAccountCreated] = useState(false)
   const [formData, setFormData] = useState({
     email: "",
-    username: "",
     password: "",
-    confirmPassword: "",
-    artistName: "",
-    bio: "",
-    genre: ""
+    confirmPassword: ""
   })
 
   const handleWalletConnect = async () => {
@@ -67,33 +62,24 @@ export function ArtistRegistrationForm() {
       return
     }
 
-    if (!formData.artistName.trim()) {
-      toast({
-        title: "Artist Name Required",
-        description: "Please enter your artist name.",
-        variant: "destructive",
-      })
-      return
-    }
-
     setIsLoading(true)
     try {
       const success = await register({
         email: formData.email,
-        username: formData.username,
-        role: "artist",
+        username: formData.email.split("@")[0], // Use email prefix as username
+        role: "listener",
       })
 
       if (success) {
         setIsAccountCreated(true)
         toast({
           title: "Account Created",
-          description: "Your artist account has been created successfully!",
+          description: "Your listener account has been created successfully!",
         })
       } else {
         toast({
           title: "Registration Failed",
-          description: "Failed to create artist account. Please try again.",
+          description: "Failed to create account. Please try again.",
           variant: "destructive",
         })
       }
@@ -153,16 +139,16 @@ export function ArtistRegistrationForm() {
   }
 
   return (
-    <Card className="max-w-md mx-auto bg-card/30 border-cyber-pink/20">
+    <Card className="max-w-md mx-auto bg-card/30 border-cyber-purple/20">
       <CardHeader className="text-center">
-        <div className="mx-auto mb-4 w-12 h-12 bg-cyber-pink rounded-full flex items-center justify-center">
-          <Mic className="h-6 w-6 text-black" />
+        <div className="mx-auto mb-4 w-12 h-12 bg-cyber-purple rounded-full flex items-center justify-center">
+          <Music className="h-6 w-6 text-black" />
         </div>
-        <CardTitle className="text-2xl font-bold text-cyber-pink">
-          Join as Artist
+        <CardTitle className="text-2xl font-bold text-cyber-purple">
+          Join as Listener
         </CardTitle>
         <p className="text-sm text-muted-foreground">
-          Create your artist account to upload and monetize your music
+          Create your listener account to start enjoying music
         </p>
       </CardHeader>
 
@@ -170,9 +156,9 @@ export function ArtistRegistrationForm() {
         {/* Account Creation Section */}
         <div className="space-y-4">
           <div className="text-center">
-            <h3 className="font-semibold text-foreground mb-2">Step 1: Create Artist Account</h3>
+            <h3 className="font-semibold text-foreground mb-2">Step 1: Create Listener Account</h3>
             <p className="text-sm text-muted-foreground mb-4">
-              Fill in your details to create an artist account
+              Fill in your details to create a listener account
             </p>
           </div>
 
@@ -186,57 +172,7 @@ export function ArtistRegistrationForm() {
                 onChange={(e) => handleInputChange("email", e.target.value)}
                 placeholder="Enter your email"
                 required
-                className="bg-input/50 border-border focus:border-cyber-pink"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="username">Username</Label>
-              <Input
-                id="username"
-                type="text"
-                value={formData.username}
-                onChange={(e) => handleInputChange("username", e.target.value)}
-                placeholder="Choose a username"
-                required
-                className="bg-input/50 border-border focus:border-cyber-pink"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="artistName">Artist Name</Label>
-              <Input
-                id="artistName"
-                type="text"
-                value={formData.artistName}
-                onChange={(e) => handleInputChange("artistName", e.target.value)}
-                placeholder="Your artist/stage name"
-                required
-                className="bg-input/50 border-border focus:border-cyber-pink"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="genre">Primary Genre</Label>
-              <Input
-                id="genre"
-                type="text"
-                value={formData.genre}
-                onChange={(e) => handleInputChange("genre", e.target.value)}
-                placeholder="e.g., Electronic, Rock, Hip-Hop"
-                className="bg-input/50 border-border focus:border-cyber-pink"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="bio">Artist Bio</Label>
-              <Textarea
-                id="bio"
-                value={formData.bio}
-                onChange={(e) => handleInputChange("bio", e.target.value)}
-                placeholder="Tell us about your music and style..."
-                rows={3}
-                className="bg-input/50 border-border focus:border-cyber-pink"
+                className="bg-input/50 border-border focus:border-cyber-purple"
               />
             </div>
 
@@ -249,7 +185,7 @@ export function ArtistRegistrationForm() {
                 onChange={(e) => handleInputChange("password", e.target.value)}
                 placeholder="Create a password"
                 required
-                className="bg-input/50 border-border focus:border-cyber-pink"
+                className="bg-input/50 border-border focus:border-cyber-purple"
               />
             </div>
 
@@ -262,24 +198,24 @@ export function ArtistRegistrationForm() {
                 onChange={(e) => handleInputChange("confirmPassword", e.target.value)}
                 placeholder="Confirm your password"
                 required
-                className="bg-input/50 border-border focus:border-cyber-pink"
+                className="bg-input/50 border-border focus:border-cyber-purple"
               />
             </div>
 
             <Button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-cyber-pink hover:bg-cyber-pink/80 glow-pink"
+              className="w-full bg-cyber-purple hover:bg-cyber-purple/80 glow-purple"
             >
               {isLoading ? (
                 <div className="flex items-center">
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
-                  Creating Artist Account...
+                  Creating Listener Account...
                 </div>
               ) : (
                 <>
-                  <Mic className="h-4 w-4 mr-2" />
-                  Create Artist Account
+                  <User className="h-4 w-4 mr-2" />
+                  Create Listener Account
                 </>
               )}
             </Button>
@@ -301,7 +237,7 @@ export function ArtistRegistrationForm() {
               disabled={isWalletConnected}
               className={`w-full ${isWalletConnected
                 ? "bg-neon-green text-black cursor-not-allowed"
-                : "bg-cyber-pink hover:bg-cyber-pink/80 glow-pink"
+                : "bg-cyber-purple hover:bg-cyber-purple/80 glow-purple"
                 }`}
             >
               <Wallet className="h-4 w-4 mr-2" />

@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Play, Pause, Loader2, Music } from "lucide-react"
 import type { Song } from "@/lib/types"
+import { useValidation } from "@/hooks/use-validation"
 
 interface SongCardProps {
   song: Song
@@ -16,10 +17,16 @@ interface SongCardProps {
 
 export function SongCard({ song, isPlaying = false, isLoading = false, onPlay, onPause }: SongCardProps) {
   const [localLoading, setLocalLoading] = useState(false)
+  const { validateAccess } = useValidation()
 
   const handlePlayClick = async () => {
     if (isPlaying) {
       onPause?.()
+      return
+    }
+
+    // Validate access before playing
+    if (!validateAccess()) {
       return
     }
 
@@ -45,9 +52,8 @@ export function SongCard({ song, isPlaying = false, isLoading = false, onPlay, o
 
   return (
     <Card
-      className={`bg-card/50 border transition-all duration-300 hover:bg-card/70 ${
-        isPlaying ? "border-cyber-pink glow-pink" : "border-border hover:border-cyber-purple/50"
-      }`}
+      className={`bg-card/50 border transition-all duration-300 hover:bg-card/70 ${isPlaying ? "border-cyber-pink glow-pink" : "border-border hover:border-cyber-purple/50"
+        }`}
     >
       <CardContent className="p-4">
         <div className="flex items-center gap-4">
@@ -56,11 +62,10 @@ export function SongCard({ song, isPlaying = false, isLoading = false, onPlay, o
             onClick={handlePlayClick}
             disabled={localLoading || isLoading}
             size="lg"
-            className={`rounded-full w-12 h-12 p-0 ${
-              isPlaying
-                ? "bg-cyber-pink hover:bg-cyber-pink/80 glow-pink"
-                : "bg-cyber-purple hover:bg-cyber-purple/80 glow-purple"
-            }`}
+            className={`rounded-full w-12 h-12 p-0 ${isPlaying
+              ? "bg-cyber-pink hover:bg-cyber-pink/80 glow-pink"
+              : "bg-cyber-purple hover:bg-cyber-purple/80 glow-purple"
+              }`}
           >
             {localLoading || isLoading ? (
               <Loader2 className="h-5 w-5 animate-spin" />

@@ -1,8 +1,55 @@
+"use client"
+
 import { SongUploadForm } from "@/components/forms/song-upload-form"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Upload, Shield, Zap, Globe } from "lucide-react"
+import { ValidationModal } from "@/components/auth/validation-modal"
+import { useValidation } from "@/hooks/use-validation"
+import { useAuth } from "@/components/auth/auth-provider"
 
 export default function UploadPage() {
+  const { showValidationModal, closeValidationModal, handleValidationSuccess, validateAccess } = useValidation()
+  const { isAuthenticated, isWalletConnected } = useAuth()
+
+  // Check if user is authenticated and has wallet connected
+  if (!isAuthenticated || !isWalletConnected) {
+    return (
+      <div className="space-y-12">
+        <div className="text-center space-y-4">
+          <h1 className="text-4xl font-bold text-balance">
+            <span className="text-cyber-pink">Upload</span> <span className="text-cyber-purple">Your Music</span>
+          </h1>
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto text-balance">
+            Share your creativity with the world. Upload your tracks and start earning from every stream through
+            decentralized technology.
+          </p>
+        </div>
+
+        <Card className="max-w-2xl mx-auto bg-card/30 border-border/50">
+          <CardContent className="p-8 text-center">
+            <Upload className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+            <h3 className="text-lg font-semibold mb-2">Authentication Required</h3>
+            <p className="text-muted-foreground mb-4">
+              Please connect your wallet and create an account to upload music.
+            </p>
+            <button
+              onClick={() => validateAccess()}
+              className="bg-cyber-pink hover:bg-cyber-pink/80 text-black px-6 py-2 rounded-md font-medium glow-pink"
+            >
+              Connect Wallet & Register
+            </button>
+          </CardContent>
+        </Card>
+
+        <ValidationModal
+          isOpen={showValidationModal}
+          onClose={closeValidationModal}
+          onSuccess={handleValidationSuccess}
+        />
+      </div>
+    )
+  }
+
   return (
     <div className="space-y-12">
       {/* Header Section */}
