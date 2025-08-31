@@ -1,5 +1,15 @@
 "use client"
 
+// Extend the Window interface to include 'rabby'
+declare global {
+  interface Window {
+    rabby?: any
+    ethereum?: any
+  }
+}
+
+import Link from "next/link"
+
 import { useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -26,8 +36,8 @@ export function ArtistRegistrationForm() {
 
   const handleWalletConnect = async () => {
     try {
-      if (typeof window.ethereum !== "undefined") {
-        const accounts = await window.ethereum.request({
+      if (typeof window.rabby !== "undefined") {
+        const accounts = await window.rabby.request({
           method: "eth_requestAccounts",
         })
 
@@ -42,14 +52,14 @@ export function ArtistRegistrationForm() {
       } else {
         toast({
           title: "MetaMask Not Found",
-          description: "Please install MetaMask to connect your wallet.",
+          description: "Por favor instala la wallet de Rabby para continuar y conectar",
           variant: "destructive",
         })
       }
     } catch (error) {
       toast({
-        title: "Connection Failed",
-        description: "Failed to connect wallet. Please try again.",
+        title: "Conexión fallida",
+        description: "Fallo al conectar a la wallet, intenta de nuevo",
         variant: "destructive",
       })
     }
@@ -119,8 +129,8 @@ export function ArtistRegistrationForm() {
     }
 
     try {
-      if (typeof window.ethereum !== "undefined") {
-        const accounts = await window.ethereum.request({
+      if (typeof window.rabby !== "undefined") {
+        const accounts = await window.rabby.request({
           method: "eth_requestAccounts",
         })
 
@@ -131,11 +141,12 @@ export function ArtistRegistrationForm() {
             title: "Wallet Connected",
             description: "Your wallet has been successfully connected!",
           })
+
         }
       } else {
         toast({
-          title: "MetaMask Not Found",
-          description: "Please install MetaMask to connect your wallet.",
+          title: "Rabby Not Found",
+          description: "Please install Rabby to connect your wallet.",
           variant: "destructive",
         })
       }
@@ -287,6 +298,7 @@ export function ArtistRegistrationForm() {
         </div>
 
         {/* Wallet Connection Section */}
+        {/* Wallet Connection Section */}
         {isAccountCreated && (
           <div className="space-y-4">
             <div className="text-center">
@@ -305,8 +317,14 @@ export function ArtistRegistrationForm() {
                 }`}
             >
               <Wallet className="h-4 w-4 mr-2" />
-              {isWalletConnected ? "Wallet Connected" : "Connect MetaMask"}
+              {isWalletConnected ? "Wallet Connected" : "Conectar a Rabby"}
             </Button>
+
+            <div className="text-center mt-4">
+              <Link href="/artist/dashboard" className="text-cyber-pink underline hover:text-cyber-pink/80">
+                Go to Dashboard
+              </Link>
+            </div>
           </div>
         )}
       </CardContent>
