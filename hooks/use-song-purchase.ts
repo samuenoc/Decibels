@@ -73,7 +73,7 @@ export function useSongPurchase() {
       // Use the wallet address stored in localStorage (same as the rest of the app)
       const storedWallet = typeof window !== 'undefined' ? localStorage.getItem('walletAddressX') : null
       const actualWallet = storedWallet || walletAddress
-      
+
       console.log('🔍 Debug info:')
       console.log('walletAddress from hook:', walletAddress)
       console.log('storedWallet from localStorage:', storedWallet)
@@ -91,7 +91,7 @@ export function useSongPurchase() {
       try {
         console.log('🔍 Checking balance for wallet:', actualWallet)
         console.log('🔍 Price parameter:', price, 'type:', typeof price)
-        
+
         const balanceResult = await getArbitrumBalance(actualWallet)
         const currentBalance = parseFloat(balanceResult.eth)
         const estimatedGasCost = 0.002 // Conservative estimate for gas costs in ETH
@@ -99,7 +99,7 @@ export function useSongPurchase() {
 
         console.log(`💰 Balance check details:`)
         console.log(`   - Current balance: ${currentBalance} ETH`)
-        console.log(`   - Song price: ${price} ETH`) 
+        console.log(`   - Song price: ${price} ETH`)
         console.log(`   - Gas estimate: ${estimatedGasCost} ETH`)
         console.log(`   - Total required: ${totalRequired} ETH`)
         console.log(`   - Balance === 0: ${currentBalance === 0}`)
@@ -148,7 +148,7 @@ export function useSongPurchase() {
       try {
         const currentChainId = await window.ethereum.request({ method: 'eth_chainId' })
         console.log('🌐 Current network:', currentChainId, 'Target:', targetChainId)
-        
+
         if (currentChainId !== targetChainId) {
           console.log('🔄 Adding and switching to Arbitrum Sepolia...')
           // First add the network, then switch to it
@@ -175,48 +175,77 @@ export function useSongPurchase() {
         return { success: false, message }
       }
 
-      // Use playSong method as specified in ABI - songId is already a number
-      const songIdNumber = songId
-      
-      console.log('🎵 Attempting to purchase song ID:', songIdNumber)
+      // First check total songs in contract
+      let totalSongs
+      try {
+        totalSongs = await contract.methods.getTotalSongs().call()
+        console.log('🎵 Total songs in contract:', totalSongs.toString())
+      } catch (error) {
+        console.error('❌ Failed to get total songs:', error)
+        const message = "❌ Could not check contract songs."
+        setPurchaseMessage(message)
+        setMessageType("error")
+        return { success: false, message }
+      }
+
+      // Check if contract has any songs
+      if (Number(totalSongs) === 0) {
+        const message = "❌ No songs available in contract. Upload songs first."
+        setPurchaseMessage(message)
+        setMessageType("error")
+        return { success: false, message }
+      }
+
+      // Use the actual songId parameter (convert to BigInt for uint256)
+      const songIdNumber = BigInt(songId)
+      console.log('🎵 Attempting to purchase song ID:', songIdNumber.toString())
+      console.log('🎵 Song ID type:', typeof songIdNumber)
+
+      // Verify song ID is within range
+      if (songIdNumber >= BigInt(totalSongs)) {
+        const message = `❌ Song ID ${songIdNumber} doesn't exist. Available: 0-${Number(totalSongs) - 1}`
+        setPurchaseMessage(message)
+        setMessageType("error")
+        return { success: false, message }
+      }
 
       console.log('💰 Song price:', price, 'ETH')
       console.log('💰 Price in wei:', priceInWei)
-      
+
       // Execute transaction directly without gas estimation (let Rabby handle it)
       console.log('🔄 Executing transaction with Rabby wallet...')
-      
+
       // Create Web3 instance with wallet provider
       const walletWeb3 = new (await import('web3')).default(window.ethereum)
       const walletContract = new walletWeb3.eth.Contract(
         contract.options.jsonInterface,
         contract.options.address
       )
-      
+
       // Get current gas price and add buffer
       const gasPrice = await walletWeb3.eth.getGasPrice()
       const bufferedGasPrice = Math.floor(Number(gasPrice) * 1.2).toString()
-      
+
       console.log('⛽ Gas configuration:')
       console.log('   - Base gas price:', gasPrice)
       console.log('   - Buffered gas price:', bufferedGasPrice)
 
       const receipt = await walletContract.methods.playSong(songIdNumber)
-        .send({ 
-          from: actualWallet, 
+        .send({
+          from: actualWallet,
           value: priceInWei, // Use the provided price
           gasPrice: bufferedGasPrice,
           gas: '100000' // Set explicit gas limit
         })
-        .on('transactionHash', function(hash: string){
+        .on('transactionHash', function (hash: string) {
           console.log("🔄 Transaction submitted with hash:", hash);
           setPurchaseMessage("🔄 Transaction submitted. Waiting for confirmation...");
           setMessageType("info");
         })
-        .on('receipt', function(receipt: any){
+        .on('receipt', function (receipt: any) {
           console.log("✅ Transaction confirmed!");
         })
-        .on('error', function(error: any) {
+        .on('error', function (error: any) {
           console.error("❌ Transaction error:", error);
           throw error;
         })
@@ -248,9 +277,9 @@ export function useSongPurchase() {
 
     } catch (error: any) {
       console.error('❌ Purchase failed:', error)
-      
+
       let message = "❌ Purchase failed. Please try again."
-      
+
       // Handle specific error types
       if (error.code === 4001) {
         message = "❌ Transaction cancelled by user."
@@ -263,7 +292,7 @@ export function useSongPurchase() {
       } else if (error.message?.includes('nonce')) {
         message = "❌ Transaction nonce error. Please refresh and try again."
       }
-      
+
       setPurchaseMessage(message)
       setMessageType("error")
       return { success: false, message }
