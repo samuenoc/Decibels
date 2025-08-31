@@ -8,9 +8,9 @@ export interface Artist {
 }
 
 export interface Song {
-  id: string
+  id: number
   title: string
-  artist_id: string
+  artist_id: number
   artist_name: string
   artist_wallet: string
   price: number // Price in ETH

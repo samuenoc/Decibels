@@ -12,63 +12,39 @@ import type { Song } from "@/lib/types"
 // Datos de ejemplo - en una app real esto vendría de una API/blockchain
 const mockSongs: Song[] = [
   {
-    id: "song_1",
+    id: 0,
     title: "Neon Dreams",
-    artist_id: "artist_1",
+    artist_id: 10,
     artist_name: "CyberSynth",
     artist_wallet: "0xcadb505909332A4190aa82b12F09Ff3572aABb55",
-    price: 0.001, // 0.001 ETH
+    price: 0.001,
     duration: 245,
     plays: 15420,
     created_at: new Date("2024-01-15"),
     isPurchased: false,
   },
   {
-    id: "song_2",
+    id: 1,
     title: "Digital Horizon",
-    artist_id: "artist_2",
-    artist_name: "NeonBeats",
-    artist_wallet: "0x691C69830B74dfDFF1572B97FB42d11348E4869A",
-    price: 0.0015, // 0.0015 ETH
-    duration: 198,
-    plays: 8750,
-    created_at: new Date("2024-01-20"),
-    isPurchased: false,
-  },
-  {
-    id: "song_3",
-    title: "Electric Pulse",
-    artist_id: "artist_1",
-    artist_name: "CyberSynth",
-    artist_wallet: "0x1080b094cFa7f8e0326530e99391A8A8da0336a1",
-    price: 0.0008, // 0.0008 ETH
-    duration: 312,
-    plays: 23100,
-    created_at: new Date("2024-01-10"),
-    isPurchased: false,
-  },
-  {
-    id: "song_4",
-    title: "Cyber Rain",
-    artist_id: "artist_3",
-    artist_name: "DigitalDreamer",
-    artist_wallet: "0x1080b094cFa7f8e0326530e99391A8A8da0336a1",
-    price: 0.0012, // 0.0012 ETH
-    duration: 267,
-    plays: 5420,
-    created_at: new Date("2024-01-25"),
-    isPurchased: false,
-  },
-  {
-    id: "song_5",
-    title: "Matrix Flow",
-    artist_id: "artist_2",
+    artist_id: 11,
     artist_name: "NeonBeats",
     artist_wallet: "0xcadb505909332A4190aa82b12F09Ff3572aABb55",
-    price: 0.001, // 0.0009 ETH
-    duration: 189,
-    plays: 12300,
-    created_at: new Date("2024-01-18"),
+    price: 0.0015,
+    duration: 198,
+    plays: 8932,
+    created_at: new Date("2024-01-12"),
+    isPurchased: false,
+  },
+  {
+    id: 2,
+    title: "Electric Pulse",
+    artist_id: 12,
+    artist_name: "CyberSynth",
+    artist_wallet: "0x1080b094cFa7f8e0326530e99391A8A8da0336a1",
+    price: 0.0008,
+    duration: 312,
+    plays: 154, // Match contract plays
+    created_at: new Date("2024-01-10"),
     isPurchased: false,
   },
 ]
@@ -88,12 +64,12 @@ export default function SongsPage() {
         const purchasedArray = JSON.parse(stored)
         const purchasedSet = new Set(purchasedArray as string[])
         setPurchasedSongs(purchasedSet)
-        
+
         // Update songs with purchase status
-        setSongs(prevSongs => 
+        setSongs(prevSongs =>
           prevSongs.map(song => ({
             ...song,
-            isPurchased: purchasedSet.has(song.id)
+            isPurchased: purchasedSet.has(song.id.toString())
           }))
         )
       }
@@ -146,24 +122,24 @@ export default function SongsPage() {
     setVolume(newVolume)
   }
 
-  const handlePurchaseSuccess = useCallback((songId: string) => {
+  const handlePurchaseSuccess = useCallback((songId: number) => {
     setPurchasedSongs(prev => {
       const newSet = new Set(prev)
-      newSet.add(songId)
-      
+      newSet.add(songId.toString())
+
       // Update localStorage
       try {
         localStorage.setItem('purchasedSongs', JSON.stringify(Array.from(newSet)))
       } catch (error) {
         console.error('Error saving purchased songs:', error)
       }
-      
+
       return newSet
     })
-    
+
     // Update song purchase status
-    setSongs(prevSongs => 
-      prevSongs.map(song => 
+    setSongs(prevSongs =>
+      prevSongs.map(song =>
         song.id === songId ? { ...song, isPurchased: true } : song
       )
     )

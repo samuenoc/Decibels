@@ -12,55 +12,70 @@ import { useWeb3 } from "@/hooks/web3";
 // Mock data for listener
 const mockRecentlyPlayed: Song[] = [
   {
-    id: "song_1",
+    id: 10,
     title: "Neon Dreams",
-    artist_id: "artist_1",
+    artist_id: 10,
     artist_name: "CyberSynth",
+    artist_wallet: "0xcadb505909332A4190aa82b12F09Ff3572aABb55",
+    price: 0.001,
     duration: 245,
     plays: 15420,
     created_at: new Date("2024-01-15"),
+    isPurchased: true,
   },
   {
-    id: "song_3",
+    id: 11,
     title: "Electric Pulse",
-    artist_id: "artist_1",
+    artist_id: 11,
     artist_name: "CyberSynth",
+    artist_wallet: "0x1080b094cFa7f8e0326530e99391A8A8da0336a1",
+    price: 0.0008,
     duration: 312,
     plays: 23100,
     created_at: new Date("2024-01-10"),
+    isPurchased: true,
   },
 ]
 
 const mockFavorites: Song[] = [
   {
-    id: "song_2",
+    id: 10,
     title: "Digital Horizon",
-    artist_id: "artist_2",
+    artist_id: 10,
     artist_name: "NeonBeats",
+    artist_wallet: "0xcadb505909332A4190aa82b12F09Ff3572aABb55",
+    price: 0.0015,
     duration: 198,
     plays: 8750,
     created_at: new Date("2024-01-20"),
+    isPurchased: true,
   },
 ]
 
 const mockRecommended: Song[] = [
   {
-    id: "song_4",
+    id: 11,
     title: "Cyber Rain",
-    artist_id: "artist_3",
+    artist_id: 11,
     artist_name: "DigitalDreamer",
+    artist_wallet: "0x1080b094cFa7f8e0326530e99391A8A8da0336a1",
+    price: 0.0012,
     duration: 267,
     plays: 5420,
     created_at: new Date("2024-01-25"),
+    isPurchased: false,
   },
   {
-    id: "song_5",
+    id: 12,
     title: "Matrix Flow",
-    artist_id: "artist_2",
+    artist_id: 12,
     artist_name: "NeonBeats",
+    artist_wallet: "0xcadb505909332A4190aa82b12F09Ff3572aABb55",
+    price: 0.001,
     duration: 189,
     plays: 12300,
     created_at: new Date("2024-01-18"),
+    isPurchased: false,
   },
 ]
 
@@ -80,14 +95,14 @@ export function ListenerDashboard() {
   })
 
   const {
-          balance,
-          isLoading,
-          error,
-          walletAddress,
-          contractAddress,
-          refreshBalance,
-          getContractInfo
-      } = useWeb3();
+    balance,
+    isLoading,
+    error,
+    walletAddress,
+    contractAddress,
+    refreshBalance,
+    getContractInfo
+  } = useWeb3();
   const [isLoadingWallet, setIsLoadingWallet] = useState(false)
   const playback = usePlayback([...mockRecentlyPlayed, ...mockFavorites, ...mockRecommended])
 

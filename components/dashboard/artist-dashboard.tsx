@@ -11,22 +11,28 @@ import type { Song } from "@/lib/types"
 // Mock data for artist
 const mockArtistSongs: Song[] = [
   {
-    id: "song_1",
+    id: 10,
     title: "Neon Dreams",
-    artist_id: "artist_1",
+    artist_id: 10,
     artist_name: "CyberSynth",
+    artist_wallet: "0xcadb505909332A4190aa82b12F09Ff3572aABb55",
+    price: 0.001,
     duration: 245,
     plays: 15420,
     created_at: new Date("2024-01-15"),
+    isPurchased: false,
   },
   {
-    id: "song_3",
+    id: 11,
     title: "Electric Pulse",
-    artist_id: "artist_1",
+    artist_id: 11,
     artist_name: "CyberSynth",
+    artist_wallet: "0xcadb505909332A4190aa82b12F09Ff3572aABb55",
+    price: 0.0008,
     duration: 312,
     plays: 23100,
     created_at: new Date("2024-01-10"),
+    isPurchased: false,
   },
 ]
 

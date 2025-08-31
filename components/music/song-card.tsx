@@ -15,7 +15,7 @@ interface SongCardProps {
   isLoading?: boolean
   onPlay?: (song: Song) => void
   onPause?: () => void
-  onPurchaseSuccess?: (songId: string) => void
+  onPurchaseSuccess?: (songId: number) => void
 }
 
 export function SongCard({ song, isPlaying = false, isLoading = false, onPlay, onPause, onPurchaseSuccess }: SongCardProps) {
@@ -58,17 +58,6 @@ export function SongCard({ song, isPlaying = false, isLoading = false, onPlay, o
   }
 
   const handlePurchaseConfirm = async (songToPurchase: Song) => {
-    // Get user wallet from localStorage or Rabby
-    let userWallet = ""
-    try {
-      if (window.rabby) {
-        const accounts = await window.rabby.request({ method: 'eth_accounts' })
-        userWallet = accounts[0] || ""
-      }
-    } catch (error) {
-      console.error('Error getting wallet:', error)
-    }
-
     const result = await purchaseSong(songToPurchase.id, songToPurchase.artist_wallet, songToPurchase.price)
     
     if (result.success) {
@@ -142,13 +131,13 @@ export function SongCard({ song, isPlaying = false, isLoading = false, onPlay, o
               {song.isPurchased ? (
                 <Music className="h-4 w-4 text-muted-foreground flex-shrink-0" />
               ) : (
-                <Lock className="h-4 w-4 text-amber-500 flex-shrink-0" />
+                <span className="text-amber-500 flex-shrink-0">🔒</span>
               )}
               <h3 className={`font-semibold truncate ${isPlaying ? "text-cyber-pink" : song.isPurchased ? "text-foreground" : "text-muted-foreground"}`}>
                 {song.title}
               </h3>
               {!song.isPurchased && (
-                <span className="text-xs bg-amber-500/20 text-amber-500 px-2 py-1 rounded-full">
+                <span className="text-xs bg-amber-500/20 text-amber-500 px-2 py-1 rounded-full font-medium">
                   {song.price} ETH
                 </span>
               )}

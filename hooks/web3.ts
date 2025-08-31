@@ -1,6 +1,7 @@
 // hooks/useWeb3.ts
 import { useState, useEffect } from 'react';
 import Web3 from 'web3';
+import CONTRACT_ABI from '@/utils/abi.json';
 
 interface ContractConfig {
     rpcUrl: string;
@@ -9,79 +10,31 @@ interface ContractConfig {
     walletAddress: string;
 }
 
-const CONFIG: ContractConfig = {
-    rpcUrl: 'https://sepolia-rollup.arbitrum.io/rpc',
-    contractAddress: '0x9C9a5e82A973c6976123fd5b29376f9A27DA0633',
-    networkId: 421614,
-    walletAddress: localStorage.getItem('walletAddressX') || ''
-};
-
-const CONTRACT_ABI = [
-    {
-        "inputs": [{ "internalType": "address", "name": "artist_address", "type": "address" }],
-        "name": "getArtist",
-        "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "getConfig",
-        "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [{ "internalType": "uint256", "name": "song_id", "type": "uint256" }],
-        "name": "getPricePerPlay",
-        "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [{ "internalType": "uint256", "name": "song_id", "type": "uint256" }],
-        "name": "getSong",
-        "outputs": [
-            { "internalType": "address", "name": "", "type": "address" },
-            { "internalType": "uint256", "name": "", "type": "uint256" },
-            { "internalType": "uint256", "name": "", "type": "uint256" },
-            { "internalType": "uint256", "name": "", "type": "uint256" }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "getTotalSongs",
-        "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "getUserAddress",
-        "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [{ "internalType": "address", "name": "artist_address", "type": "address" }],
-        "name": "isArtist",
-        "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
-        "stateMutability": "view",
-        "type": "function"
-    }
-];
+// Load configuration from environment variables
+const getBaseConfig = () => ({
+    rpcUrl: process.env.RPC_URL || 'https://sepolia-rollup.arbitrum.io/rpc',
+    contractAddress: process.env.STYLUS_CONTRACT_ADDRESS || '0xae38a87b0b7097893f2313250cf7f319b069a1a2',
+    networkId: parseInt(process.env.NETWORK_ID || '421614')
+});
 
 export const useWeb3 = () => {
     const [web3, setWeb3] = useState<Web3 | null>(null);
     const [contract, setContract] = useState<any>(null);
     const [balance, setBalance] = useState<string>('0');
+    const [walletAddress, setWalletAddress] = useState<string>('');
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [error, setError] = useState<string>('');
 
     useEffect(() => {
         initWeb3();
+
+        // Load wallet address from localStorage
+        if (typeof window !== 'undefined') {
+            const storedWallet = localStorage.getItem('walletAddressX')
+            if (storedWallet) {
+                setWalletAddress(storedWallet)
+            }
+        }
     }, []);
 
     const initWeb3 = async () => {
@@ -89,19 +42,26 @@ export const useWeb3 = () => {
             setIsLoading(true);
             setError('');
 
+            const config = getBaseConfig();
+
             // Inicializar Web3 con el RPC de Arbitrum Sepolia
-            const web3Instance = new Web3(CONFIG.rpcUrl);
+            const web3Instance = new Web3(config.rpcUrl);
             setWeb3(web3Instance);
 
             // Crear instancia del contrato
             const contractInstance = new web3Instance.eth.Contract(
                 CONTRACT_ABI,
-                CONFIG.contractAddress
+                config.contractAddress
             );
             setContract(contractInstance);
 
-            // Obtener balance del wallet
-            await getBalance(web3Instance);
+            // Obtener balance del wallet si está disponible
+            if (typeof window !== 'undefined') {
+                const storedWallet = localStorage.getItem('walletAddressX')
+                if (storedWallet) {
+                    await getBalance(web3Instance, storedWallet);
+                }
+            }
 
         } catch (err) {
             console.error('Error inicializando Web3:', err);
@@ -111,12 +71,14 @@ export const useWeb3 = () => {
         }
     };
 
-    const getBalance = async (web3Instance?: Web3) => {
+    const getBalance = async (web3Instance?: Web3, targetWallet?: string) => {
         try {
             const web3ToUse = web3Instance || web3;
-            if (!web3ToUse) return;
+            const wallet = targetWallet || walletAddress;
 
-            const balanceWei = await web3ToUse.eth.getBalance(CONFIG.walletAddress);
+            if (!web3ToUse || !wallet) return;
+
+            const balanceWei = await web3ToUse.eth.getBalance(wallet);
             const balanceEth = web3ToUse.utils.fromWei(balanceWei, 'ether');
             setBalance(balanceEth);
         } catch (err) {
@@ -132,11 +94,11 @@ export const useWeb3 = () => {
     };
 
     const getContractInfo = async () => {
-        if (!contract) return null;
+        if (!contract || !walletAddress) return null;
 
         try {
             const totalSongs = await contract.methods.getTotalSongs().call();
-            const isArtist = await contract.methods.isArtist(CONFIG.walletAddress).call();
+            const isArtist = await contract.methods.isArtist(walletAddress).call();
 
             return {
                 totalSongs: totalSongs.toString(),
@@ -152,11 +114,17 @@ export const useWeb3 = () => {
         web3,
         contract,
         balance,
+        walletAddress,
         isLoading,
         error,
-        walletAddress: CONFIG.walletAddress,
-        contractAddress: CONFIG.contractAddress,
+        contractAddress: getBaseConfig().contractAddress,
         refreshBalance,
-        getContractInfo
+        getContractInfo,
+        updateWalletAddress: (address: string) => {
+            setWalletAddress(address)
+            if (typeof window !== 'undefined') {
+                localStorage.setItem('walletAddressX', address)
+            }
+        }
     };
 };

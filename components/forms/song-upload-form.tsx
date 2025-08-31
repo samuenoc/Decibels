@@ -1,13 +1,13 @@
 "use client"
 
-import type React from "react"
-import { useState, useRef } from "react"
+import React, { useState, useRef, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Upload, CheckCircle, Loader2, FileAudio, X } from "lucide-react"
+import { Upload, CheckCircle, Loader2, FileAudio, X, AlertCircle } from "lucide-react"
+import { useSongUpload } from "@/hooks/use-song-upload"
 import type { Song } from "@/lib/types"
 
 interface SongUploadFormProps {
@@ -17,24 +17,28 @@ interface SongUploadFormProps {
 export function SongUploadForm({ onSubmit }: SongUploadFormProps) {
   const [formData, setFormData] = useState({
     title: "",
-    artist_id: "",
     artist_name: "",
+    artist_wallet: "",
+    price: 0.001,
     audio_hash: "",
     duration: 0,
   })
   const [audioFile, setAudioFile] = useState<File | null>(null)
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [isSuccess, setIsSuccess] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [dragActive, setDragActive] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const { uploadSong, isLoading, uploadMessage, messageType, clearMessage } = useSongUpload()
+  const [isSuccess, setIsSuccess] = useState(false)
 
-  // Datos de artistas de ejemplo
-  const mockArtists = [
-    { id: "artist_1", name: "CyberSynth" },
-    { id: "artist_2", name: "NeonBeats" },
-    { id: "artist_3", name: "DigitalDreamer" },
-  ]
+  // Get artist info from localStorage
+  const getArtistInfo = () => {
+    if (typeof window !== 'undefined') {
+      const userEmail = localStorage.getItem('userEmail') || 'Unknown Artist'
+      const walletAddress = localStorage.getItem('walletAddressX') || ''
+      return { name: userEmail.split('@')[0], wallet: walletAddress }
+    }
+    return { name: 'Unknown Artist', wallet: '' }
+  }
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {}
@@ -43,8 +47,16 @@ export function SongUploadForm({ onSubmit }: SongUploadFormProps) {
       newErrors.title = "El título de la canción es obligatorio"
     }
 
-    if (!formData.artist_id) {
-      newErrors.artist_id = "Por favor selecciona un artista"
+    if (!formData.artist_name.trim()) {
+      newErrors.artist_name = "El nombre del artista es obligatorio"
+    }
+
+    if (!formData.artist_wallet.trim()) {
+      newErrors.artist_wallet = "La dirección del wallet es obligatoria"
+    }
+
+    if (formData.price <= 0) {
+      newErrors.price = "El precio debe ser mayor a 0"
     }
 
     if (!audioFile) {
@@ -59,24 +71,40 @@ export function SongUploadForm({ onSubmit }: SongUploadFormProps) {
     e.preventDefault()
     if (!validateForm()) return
 
-    setIsSubmitting(true)
-    await new Promise((resolve) => setTimeout(resolve, 3000)) // Simula carga de archivo
-    setIsSuccess(true)
-    setIsSubmitting(false)
-
-    if (onSubmit) {
-      onSubmit({
-        ...formData,
-        audio_hash: `ipfs_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+    clearMessage()
+    
+    try {
+      const result = await uploadSong({
+        title: formData.title,
+        artist_name: formData.artist_name,
+        artist_wallet: formData.artist_wallet,
+        price: formData.price,
+        audio_hash: formData.audio_hash,
+        duration: formData.duration,
+        isPurchased: false
       })
-    }
 
-    // Resetear formulario después de éxito
-    setTimeout(() => {
-      setIsSuccess(false)
-      setFormData({ title: "", artist_id: "", artist_name: "", audio_hash: "", duration: 0 })
-      setAudioFile(null)
-    }, 3000)
+      if (result.success) {
+        setIsSuccess(true)
+        // Reset form after success
+        setTimeout(() => {
+          setIsSuccess(false)
+          const artistInfo = getArtistInfo()
+          setFormData({ 
+            title: "", 
+            artist_name: artistInfo.name, 
+            artist_wallet: artistInfo.wallet, 
+            price: 0.001,
+            audio_hash: "", 
+            duration: 0 
+          })
+          setAudioFile(null)
+          clearMessage()
+        }, 3000)
+      }
+    } catch (error) {
+      console.error('Upload failed:', error)
+    }
   }
 
   const handleInputChange = (field: string, value: string | number) => {
@@ -84,15 +112,15 @@ export function SongUploadForm({ onSubmit }: SongUploadFormProps) {
     if (errors[field]) setErrors((prev) => ({ ...prev, [field]: "" }))
   }
 
-  const handleArtistSelect = (artistId: string) => {
-    const artist = mockArtists.find((a) => a.id === artistId)
-    setFormData((prev) => ({
+  // Initialize artist info on component mount
+  useEffect(() => {
+    const artistInfo = getArtistInfo()
+    setFormData(prev => ({
       ...prev,
-      artist_id: artistId,
-      artist_name: artist?.name || "",
+      artist_name: artistInfo.name,
+      artist_wallet: artistInfo.wallet
     }))
-    if (errors.artist_id) setErrors((prev) => ({ ...prev, artist_id: "" }))
-  }
+  }, [])
 
   const handleDrag = (e: React.DragEvent) => {
     e.preventDefault()
@@ -179,24 +207,53 @@ export function SongUploadForm({ onSubmit }: SongUploadFormProps) {
             {errors.title && <p className="text-sm text-destructive">{errors.title}</p>}
           </div>
 
-          {/* Artista */}
+          {/* Artist Name */}
           <div className="space-y-2">
-            <Label htmlFor="artist" className="text-foreground">Artista *</Label>
-            <Select onValueChange={handleArtistSelect} value={formData.artist_id}>
-              <SelectTrigger
-                className={`bg-input/50 border-border focus:border-cyber-pink ${errors.artist_id ? "border-destructive" : ""}`}
-              >
-                <SelectValue placeholder="Selecciona un artista" />
-              </SelectTrigger>
-              <SelectContent>
-                {mockArtists.map((artist) => (
-                  <SelectItem key={artist.id} value={artist.id}>{artist.name}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {errors.artist_id && <p className="text-sm text-destructive">{errors.artist_id}</p>}
+            <Label htmlFor="artist_name" className="text-foreground">Nombre del Artista *</Label>
+            <Input
+              id="artist_name"
+              type="text"
+              placeholder="Tu nombre como artista"
+              value={formData.artist_name}
+              onChange={(e) => handleInputChange("artist_name", e.target.value)}
+              className={`bg-input/50 border-border focus:border-cyber-pink ${errors.artist_name ? "border-destructive" : ""}`}
+            />
+            {errors.artist_name && <p className="text-sm text-destructive">{errors.artist_name}</p>}
+          </div>
+
+          {/* Artist Wallet */}
+          <div className="space-y-2">
+            <Label htmlFor="artist_wallet" className="text-foreground">Wallet del Artista *</Label>
+            <Input
+              id="artist_wallet"
+              type="text"
+              placeholder="0x..."
+              value={formData.artist_wallet}
+              onChange={(e) => handleInputChange("artist_wallet", e.target.value)}
+              className={`bg-input/50 border-border focus:border-cyber-pink ${errors.artist_wallet ? "border-destructive" : ""}`}
+            />
+            {errors.artist_wallet && <p className="text-sm text-destructive">{errors.artist_wallet}</p>}
             <p className="text-xs text-muted-foreground">
-              ¿No ves tu perfil de artista? <span className="text-cyber-purple">Regístrate primero como artista</span>
+              Dirección del wallet conectado
+            </p>
+          </div>
+
+          {/* Price */}
+          <div className="space-y-2">
+            <Label htmlFor="price" className="text-foreground">Precio por reproducción (ETH) *</Label>
+            <Input
+              id="price"
+              type="number"
+              step="0.0001"
+              min="0.0001"
+              placeholder="0.001"
+              value={formData.price}
+              onChange={(e) => handleInputChange("price", parseFloat(e.target.value) || 0)}
+              className={`bg-input/50 border-border focus:border-cyber-pink ${errors.price ? "border-destructive" : ""}`}
+            />
+            {errors.price && <p className="text-sm text-destructive">{errors.price}</p>}
+            <p className="text-xs text-muted-foreground">
+              Precio que los usuarios pagarán por reproducir/comprar tu canción
             </p>
           </div>
 
@@ -209,8 +266,8 @@ export function SongUploadForm({ onSubmit }: SongUploadFormProps) {
             {!audioFile ? (
               <div
                 className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${dragActive ? "border-cyber-pink bg-cyber-pink/10"
-                    : errors.audio_file ? "border-destructive bg-destructive/10"
-                      : "border-border bg-input/20 hover:border-cyber-pink/50"
+                  : errors.audio_file ? "border-destructive bg-destructive/10"
+                    : "border-border bg-input/20 hover:border-cyber-pink/50"
                   }`}
                 onDragEnter={handleDrag}
                 onDragLeave={handleDrag}
@@ -259,6 +316,20 @@ export function SongUploadForm({ onSubmit }: SongUploadFormProps) {
             {errors.audio_file && <p className="text-sm text-destructive">{errors.audio_file}</p>}
           </div>
 
+          {/* Upload Status */}
+          {uploadMessage && (
+            <div className={`rounded-lg p-4 border ${
+              messageType === 'success' ? 'bg-green-500/10 border-green-500/20 text-green-400' :
+              messageType === 'error' ? 'bg-red-500/10 border-red-500/20 text-red-400' :
+              'bg-blue-500/10 border-blue-500/20 text-blue-400'
+            }`}>
+              <div className="flex items-center gap-2">
+                {messageType === 'error' && <AlertCircle className="h-4 w-4" />}
+                <p className="text-sm">{uploadMessage}</p>
+              </div>
+            </div>
+          )}
+
           {/* Proceso de subida */}
           <div className="bg-card/30 rounded-lg p-4 border border-border/50">
             <h4 className="font-semibold text-cyber-purple mb-2">Proceso de subida</h4>
@@ -273,14 +344,14 @@ export function SongUploadForm({ onSubmit }: SongUploadFormProps) {
           {/* Botón de subir */}
           <Button
             type="submit"
-            disabled={isSubmitting}
+            disabled={isLoading}
             className="w-full bg-cyber-pink hover:bg-cyber-pink/80 glow-pink"
             size="lg"
           >
-            {isSubmitting ? (
+            {isLoading ? (
               <>
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                Subiendo a IPFS...
+                Subiendo a Blockchain...
               </>
             ) : (
               <>
@@ -292,7 +363,7 @@ export function SongUploadForm({ onSubmit }: SongUploadFormProps) {
 
           <div className="text-center text-sm text-muted-foreground">
             <p>Al subir, confirmas que posees los derechos de esta música.</p>
-            <p className="mt-1">Integración con IPFS y smart contracts próximamente.</p>
+            <p className="mt-1">Tu canción se registrará en la blockchain de Arbitrum Sepolia.</p>
           </div>
         </form>
       </CardContent>
