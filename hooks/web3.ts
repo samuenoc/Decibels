@@ -13,7 +13,7 @@ const CONFIG: ContractConfig = {
     rpcUrl: 'https://sepolia-rollup.arbitrum.io/rpc',
     contractAddress: '0x9C9a5e82A973c6976123fd5b29376f9A27DA0633',
     networkId: 421614,
-    walletAddress: '0x1b5adfa2b6aff816dcedef99c405bf3626698632'
+    walletAddress: localStorage.getItem('walletAddressX') || ''
 };
 
 const CONTRACT_ABI = [

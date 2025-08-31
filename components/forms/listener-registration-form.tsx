@@ -44,6 +44,7 @@ export function ListenerRegistrationForm() {
 
         if (accounts.length > 0) {
           const address = accounts[0]
+          localStorage.setItem('walletAddressX', address)
           connectWallet(address)
           toast({
             title: "Wallet conectada",
@@ -215,6 +216,7 @@ export function ListenerRegistrationForm() {
 
         if (accounts.length > 0) {
           const address = accounts[0]
+          console.log("Login wallet address:", address)
           setIsLoginWalletConnected(true)
           toast({
             title: "Wallet conectada",
@@ -225,7 +227,7 @@ export function ListenerRegistrationForm() {
           localStorage.setItem('isAuthenticated', 'true')
           localStorage.setItem('userType', 'listener')
           localStorage.setItem('userEmail', loginData.email)
-
+          localStorage.setItem('walletAddressX', address)
           // Trigger navigation update
           window.dispatchEvent(new Event('authStateChanged'))
 

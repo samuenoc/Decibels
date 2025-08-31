@@ -7,6 +7,7 @@ import { SongCard } from "@/components/music/song-card"
 import { usePlayback } from "@/hooks/use-playback"
 import { Music, Heart, Clock, TrendingUp, Wallet, RefreshCw } from "lucide-react"
 import type { Song } from "@/lib/types"
+import { useWeb3 } from "@/hooks/web3";
 
 // Mock data for listener
 const mockRecentlyPlayed: Song[] = [
@@ -77,6 +78,16 @@ export function ListenerDashboard() {
     address: "",
     isConnected: false
   })
+
+  const {
+          balance,
+          isLoading,
+          error,
+          walletAddress,
+          contractAddress,
+          refreshBalance,
+          getContractInfo
+      } = useWeb3();
   const [isLoadingWallet, setIsLoadingWallet] = useState(false)
   const playback = usePlayback([...mockRecentlyPlayed, ...mockFavorites, ...mockRecommended])
 
@@ -124,7 +135,7 @@ export function ListenerDashboard() {
   }
 
   // Función para refrescar balance
-  const refreshBalance = async () => {
+  const refreshWalletBalance = async () => {
     if (!walletBalance.isConnected || !walletBalance.address) return
 
     setIsLoadingWallet(true)
@@ -209,7 +220,7 @@ export function ListenerDashboard() {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={refreshBalance}
+                onClick={refreshWalletBalance}
                 disabled={isLoadingWallet}
                 className="h-8 w-8 p-0 text-cyber-purple hover:bg-cyber-purple/10"
               >
@@ -219,7 +230,7 @@ export function ListenerDashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-cyber-purple mb-1">
-              {walletBalance.balance} ETH
+              {balance} ETH
             </div>
             <p className="text-xs text-muted-foreground">
               {formatAddress(walletBalance.address)}
