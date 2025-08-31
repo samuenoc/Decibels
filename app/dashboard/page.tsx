@@ -52,7 +52,7 @@ export default function DashboardPage() {
                 }`}
             >
               <Music className="h-4 w-4 mr-2" />
-              Artist
+              Artista
             </Button>
           </div>
         </CardContent>

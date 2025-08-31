@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { User, Mail, Lock, Music, Wallet } from "lucide-react"
+import { User, Music, Wallet } from "lucide-react"
 import { useAuth } from "@/components/auth/auth-provider"
 import { toast } from "@/hooks/use-toast"
 
@@ -30,21 +30,21 @@ export function ListenerRegistrationForm() {
           const address = accounts[0]
           connectWallet(address)
           toast({
-            title: "Wallet Connected",
-            description: "Your wallet has been successfully connected!",
+            title: "Wallet Conectada",
+            description: "¡Tu wallet se ha conectado correctamente!",
           })
         }
       } else {
         toast({
-          title: "MetaMask Not Found",
-          description: "Please install MetaMask to connect your wallet.",
+          title: "MetaMask no encontrada",
+          description: "Por favor instala MetaMask para conectar tu wallet.",
           variant: "destructive",
         })
       }
     } catch (error) {
       toast({
-        title: "Connection Failed",
-        description: "Failed to connect wallet. Please try again.",
+        title: "Error de conexión",
+        description: "No se pudo conectar la wallet. Intenta nuevamente.",
         variant: "destructive",
       })
     }
@@ -55,8 +55,8 @@ export function ListenerRegistrationForm() {
 
     if (formData.password !== formData.confirmPassword) {
       toast({
-        title: "Password Mismatch",
-        description: "Passwords do not match. Please try again.",
+        title: "Contraseñas no coinciden",
+        description: "Las contraseñas no coinciden. Intenta nuevamente.",
         variant: "destructive",
       })
       return
@@ -66,27 +66,27 @@ export function ListenerRegistrationForm() {
     try {
       const success = await register({
         email: formData.email,
-        username: formData.email.split("@")[0], // Use email prefix as username
+        username: formData.email.split("@")[0], // Usamos el prefijo del email como username
         role: "listener",
       })
 
       if (success) {
         setIsAccountCreated(true)
         toast({
-          title: "Account Created",
-          description: "Your listener account has been created successfully!",
+          title: "Cuenta creada",
+          description: "¡Tu cuenta de oyente se ha creado exitosamente!",
         })
       } else {
         toast({
-          title: "Registration Failed",
-          description: "Failed to create account. Please try again.",
+          title: "Registro fallido",
+          description: "No se pudo crear la cuenta. Intenta nuevamente.",
           variant: "destructive",
         })
       }
     } catch (error) {
       toast({
-        title: "Registration Error",
-        description: "An error occurred during registration.",
+        title: "Error de registro",
+        description: "Ocurrió un error durante el registro.",
         variant: "destructive",
       })
     } finally {
@@ -97,41 +97,14 @@ export function ListenerRegistrationForm() {
   const handleConnectWallet = async () => {
     if (!isAccountCreated) {
       toast({
-        title: "Account Required",
-        description: "Please create your account first.",
+        title: "Cuenta requerida",
+        description: "Por favor crea tu cuenta primero.",
         variant: "destructive",
       })
       return
     }
 
-    try {
-      if (typeof window.ethereum !== "undefined") {
-        const accounts = await window.ethereum.request({
-          method: "eth_requestAccounts",
-        })
-
-        if (accounts.length > 0) {
-          const address = accounts[0]
-          connectWallet(address)
-          toast({
-            title: "Wallet Connected",
-            description: "Your wallet has been successfully connected!",
-          })
-        }
-      } else {
-        toast({
-          title: "MetaMask Not Found",
-          description: "Please install MetaMask to connect your wallet.",
-          variant: "destructive",
-        })
-      }
-    } catch (error) {
-      toast({
-        title: "Connection Failed",
-        description: "Failed to connect wallet. Please try again.",
-        variant: "destructive",
-      })
-    }
+    handleWalletConnect()
   }
 
   const handleInputChange = (field: string, value: string) => {
@@ -145,58 +118,58 @@ export function ListenerRegistrationForm() {
           <Music className="h-6 w-6 text-black" />
         </div>
         <CardTitle className="text-2xl font-bold text-cyber-purple">
-          Join as Listener
+          Registrarse como Oyente
         </CardTitle>
         <p className="text-sm text-muted-foreground">
-          Create your listener account to start enjoying music
+          Crea tu cuenta para empezar a disfrutar de la música
         </p>
       </CardHeader>
 
       <CardContent className="space-y-6">
-        {/* Account Creation Section */}
+        {/* Sección de creación de cuenta */}
         <div className="space-y-4">
           <div className="text-center">
-            <h3 className="font-semibold text-foreground mb-2">Step 1: Create Listener Account</h3>
+            <h3 className="font-semibold text-foreground mb-2">Paso 1: Crear cuenta de oyente</h3>
             <p className="text-sm text-muted-foreground mb-4">
-              Fill in your details to create a listener account
+              Completa tus datos para crear una cuenta de oyente
             </p>
           </div>
 
           <form onSubmit={handleCreateAccount} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">Correo electrónico</Label>
               <Input
                 id="email"
                 type="email"
                 value={formData.email}
                 onChange={(e) => handleInputChange("email", e.target.value)}
-                placeholder="Enter your email"
+                placeholder="Ingresa tu correo electrónico"
                 required
                 className="bg-input/50 border-border focus:border-cyber-purple"
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">Contraseña</Label>
               <Input
                 id="password"
                 type="password"
                 value={formData.password}
                 onChange={(e) => handleInputChange("password", e.target.value)}
-                placeholder="Create a password"
+                placeholder="Crea una contraseña"
                 required
                 className="bg-input/50 border-border focus:border-cyber-purple"
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Confirm Password</Label>
+              <Label htmlFor="confirmPassword">Confirmar contraseña</Label>
               <Input
                 id="confirmPassword"
                 type="password"
                 value={formData.confirmPassword}
                 onChange={(e) => handleInputChange("confirmPassword", e.target.value)}
-                placeholder="Confirm your password"
+                placeholder="Confirma tu contraseña"
                 required
                 className="bg-input/50 border-border focus:border-cyber-purple"
               />
@@ -210,25 +183,25 @@ export function ListenerRegistrationForm() {
               {isLoading ? (
                 <div className="flex items-center">
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
-                  Creating Listener Account...
+                  Creando cuenta...
                 </div>
               ) : (
                 <>
                   <User className="h-4 w-4 mr-2" />
-                  Create Listener Account
+                  Crear cuenta
                 </>
               )}
             </Button>
           </form>
         </div>
 
-        {/* Wallet Connection Section */}
+        {/* Sección de conexión de wallet */}
         {isAccountCreated && (
           <div className="space-y-4">
             <div className="text-center">
-              <h3 className="font-semibold text-foreground mb-2">Step 2: Connect Wallet</h3>
+              <h3 className="font-semibold text-foreground mb-2">Paso 2: Conectar Wallet</h3>
               <p className="text-sm text-muted-foreground mb-4">
-                Connect your MetaMask wallet to complete registration
+                Conecta tu wallet para completar el registro
               </p>
             </div>
 
@@ -241,7 +214,7 @@ export function ListenerRegistrationForm() {
                 }`}
             >
               <Wallet className="h-4 w-4 mr-2" />
-              {isWalletConnected ? "Wallet Connected" : "Connect MetaMask"}
+              {isWalletConnected ? "Wallet Conectada" : "Conectar Wallet"}
             </Button>
           </div>
         )}

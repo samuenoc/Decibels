@@ -25,7 +25,7 @@ export default function RootLayout({
       <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable} min-h-screen`}>
         <UserModeProvider>
           <AuthProvider>
-            <Suspense fallback={<div>Loading...</div>}>
+            <Suspense fallback={<div>Cargando...</div>}>
               <Navigation />
               <main className="container mx-auto px-4 py-8">{children}</main>
             </Suspense>

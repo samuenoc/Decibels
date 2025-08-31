@@ -7,44 +7,47 @@ import { User, Music, Headphones } from "lucide-react"
 export default function ListenerRegisterPage() {
     return (
         <div className="space-y-12">
-            {/* Header Section */}
+            {/* Sección de encabezado */}
             <div className="text-center space-y-4">
                 <h1 className="text-4xl font-bold text-balance">
-                    <span className="text-cyber-purple">Join as</span> <span className="text-cyber-purple">Listener</span>
+                    <span className="text-cyber-purple">Únete como</span>{" "}
+                    <span className="text-cyber-purple">Oyente</span>
                 </h1>
                 <p className="text-xl text-muted-foreground max-w-2xl mx-auto text-balance">
-                    Create your listener account to start enjoying music on CyberBeats. Connect your wallet and start streaming.
+                    Crea tu cuenta de oyente para empezar a disfrutar música en CyberBeats. Conecta tu wallet y comienza a reproducir.
                 </p>
             </div>
 
-            {/* Benefits Section */}
+            {/* Sección de beneficios */}
             <div className="grid md:grid-cols-3 gap-4">
                 <Card className="bg-card/30 border-cyber-purple/20 text-center p-4">
                     <Headphones className="h-8 w-8 text-cyber-purple mx-auto mb-2" />
-                    <h3 className="font-semibold text-cyber-purple">Unlimited Streaming</h3>
-                    <p className="text-sm text-muted-foreground">Listen to all music without restrictions</p>
+                    <h3 className="font-semibold text-cyber-purple">Streaming Ilimitado</h3>
+                    <p className="text-sm text-muted-foreground">Escucha toda la música sin restricciones</p>
                 </Card>
 
                 <Card className="bg-card/30 border-cyber-purple/20 text-center p-4">
                     <Music className="h-8 w-8 text-cyber-purple mx-auto mb-2" />
-                    <h3 className="font-semibold text-cyber-purple">High Quality Audio</h3>
-                    <p className="text-sm text-muted-foreground">Lossless streaming with premium quality</p>
+                    <h3 className="font-semibold text-cyber-purple">Audio de Alta Calidad</h3>
+                    <p className="text-sm text-muted-foreground">Streaming sin pérdida y con calidad premium</p>
                 </Card>
 
                 <Card className="bg-card/30 border-cyber-purple/20 text-center p-4">
                     <User className="h-8 w-8 text-cyber-purple mx-auto mb-2" />
-                    <h3 className="font-semibold text-cyber-purple">Free Account</h3>
-                    <p className="text-sm text-muted-foreground">No subscription fees, completely free</p>
+                    <h3 className="font-semibold text-cyber-purple">Cuenta Gratuita</h3>
+                    <p className="text-sm text-muted-foreground">Sin tarifas de suscripción, completamente gratis</p>
                 </Card>
             </div>
 
-            {/* Registration Form */}
+            {/* Formulario de registro */}
             <ListenerRegistrationForm />
 
-            {/* Additional Info */}
+            {/* Información adicional */}
             <Card className="max-w-2xl mx-auto bg-card/30 border-border/50">
                 <CardHeader>
-                    <CardTitle className="text-center text-cyber-purple">Why Join as a Listener?</CardTitle>
+                    <CardTitle className="text-center text-cyber-purple">
+                        ¿Por qué unirte como oyente?
+                    </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                     <div className="grid gap-4">
@@ -53,9 +56,9 @@ export default function ListenerRegisterPage() {
                                 1
                             </div>
                             <div>
-                                <h4 className="font-semibold">Connect Wallet</h4>
+                                <h4 className="font-semibold">Conectar Wallet</h4>
                                 <p className="text-sm text-muted-foreground">
-                                    Link your MetaMask wallet for secure authentication
+                                    Vincula tu wallet MetaMask para una autenticación segura
                                 </p>
                             </div>
                         </div>
@@ -65,9 +68,9 @@ export default function ListenerRegisterPage() {
                                 2
                             </div>
                             <div>
-                                <h4 className="font-semibold">Create Account</h4>
+                                <h4 className="font-semibold">Crear Cuenta</h4>
                                 <p className="text-sm text-muted-foreground">
-                                    Simple registration with email and password
+                                    Registro sencillo con correo electrónico y contraseña
                                 </p>
                             </div>
                         </div>
@@ -77,9 +80,9 @@ export default function ListenerRegisterPage() {
                                 3
                             </div>
                             <div>
-                                <h4 className="font-semibold">Start Listening</h4>
+                                <h4 className="font-semibold">Comienza a Escuchar</h4>
                                 <p className="text-sm text-muted-foreground">
-                                    Access all music and start streaming immediately
+                                    Accede a toda la música y empieza a reproducir de inmediato
                                 </p>
                             </div>
                         </div>

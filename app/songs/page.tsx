@@ -9,7 +9,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Search, Music, TrendingUp } from "lucide-react"
 import type { Song } from "@/lib/types"
 
-// Mock songs data - in real app this would come from API/blockchain
+// Datos de ejemplo - en una app real esto vendría de una API/blockchain
 const mockSongs: Song[] = [
   {
     id: "song_1",
@@ -70,7 +70,7 @@ export default function SongsPage() {
 
   const handlePlay = async (song: Song) => {
     setIsLoading(true)
-    // Simulate loading time
+    // Simular tiempo de carga
     await new Promise((resolve) => setTimeout(resolve, 1500))
     setCurrentSong(song)
     setIsPlaying(true)
@@ -131,28 +131,29 @@ export default function SongsPage() {
 
   return (
     <div className="space-y-8 pb-32">
-      {/* Header */}
+      {/* Encabezado */}
       <div className="text-center space-y-4">
         <h1 className="text-4xl font-bold text-balance">
-          <span className="text-cyber-purple">Discover</span> <span className="text-cyber-pink">Music</span>
+          <span className="text-cyber-purple">Descubre</span>{" "}
+          <span className="text-cyber-pink">Música</span>
         </h1>
         <p className="text-xl text-muted-foreground max-w-2xl mx-auto text-balance">
-          Explore the latest tracks from artists around the world. Stream music powered by blockchain technology.
+          Explora las últimas canciones de artistas de todo el mundo. Reproduce música impulsada por tecnología blockchain.
         </p>
       </div>
 
-      {/* Stats */}
+      {/* Estadísticas */}
       <div className="grid md:grid-cols-3 gap-4">
         <Card className="bg-card/30 border-cyber-purple/20 text-center p-4">
           <Music className="h-8 w-8 text-cyber-purple mx-auto mb-2" />
           <div className="text-2xl font-bold text-cyber-purple">{totalSongs}</div>
-          <div className="text-sm text-muted-foreground">Songs Available</div>
+          <div className="text-sm text-muted-foreground">Canciones Disponibles</div>
         </Card>
 
         <Card className="bg-card/30 border-cyber-pink/20 text-center p-4">
           <TrendingUp className="h-8 w-8 text-cyber-pink mx-auto mb-2" />
           <div className="text-2xl font-bold text-cyber-pink">{totalPlays.toLocaleString()}</div>
-          <div className="text-sm text-muted-foreground">Total Plays</div>
+          <div className="text-sm text-muted-foreground">Reproducciones Totales</div>
         </Card>
 
         <Card className="bg-card/30 border-electric-blue/20 text-center p-4">
@@ -160,18 +161,18 @@ export default function SongsPage() {
             {totalArtists}
           </div>
           <div className="text-2xl font-bold text-electric-blue">{totalArtists}</div>
-          <div className="text-sm text-muted-foreground">Active Artists</div>
+          <div className="text-sm text-muted-foreground">Artistas Activos</div>
         </Card>
       </div>
 
-      {/* Search and Filter */}
+      {/* Búsqueda y Filtros */}
       <Card className="bg-card/30 border-border/50">
         <CardContent className="p-4">
           <div className="flex gap-4 items-center">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Search songs or artists..."
+                placeholder="Buscar canciones o artistas..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-10 bg-input/50 border-border focus:border-cyber-purple"
@@ -198,7 +199,7 @@ export default function SongsPage() {
                     : "border-cyber-pink text-cyber-pink hover:bg-cyber-pink hover:text-black"
                 }
               >
-                Recent
+                Recientes
               </Button>
               <Button
                 variant={sortBy === "title" ? "default" : "outline"}
@@ -216,14 +217,14 @@ export default function SongsPage() {
         </CardContent>
       </Card>
 
-      {/* Song List */}
+      {/* Lista de canciones */}
       <div className="space-y-4">
         {filteredSongs.length === 0 ? (
           <Card className="bg-card/30 border-border/50">
             <CardContent className="p-8 text-center">
               <Music className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-              <h3 className="text-lg font-semibold mb-2">No songs found</h3>
-              <p className="text-muted-foreground">Try adjusting your search or filter criteria</p>
+              <h3 className="text-lg font-semibold mb-2">No se encontraron canciones</h3>
+              <p className="text-muted-foreground">Prueba ajustando tu búsqueda o criterios de filtro</p>
             </CardContent>
           </Card>
         ) : (
@@ -240,7 +241,7 @@ export default function SongsPage() {
         )}
       </div>
 
-      {/* Playback Controls */}
+      {/* Controles de reproducción */}
       <PlaybackControls
         currentSong={currentSong}
         isPlaying={isPlaying}

@@ -10,10 +10,10 @@ export default function ArtistRegisterPage() {
             {/* Header Section */}
             <div className="text-center space-y-4">
                 <h1 className="text-4xl font-bold text-balance">
-                    <span className="text-cyber-pink">Join as</span> <span className="text-cyber-pink">Artist</span>
+                    <span className="text-cyber-pink">Unete como</span> <span className="text-cyber-pink">Artista</span>
                 </h1>
                 <p className="text-xl text-muted-foreground max-w-2xl mx-auto text-balance">
-                    Create your artist account to upload music and start earning from every stream. Connect your wallet and monetize your creativity.
+                    Crea tu cuenta de artista para cargar música y comenzar a ganar dinero con cada transmisión. Conecta tu billetera y monetiza tu creatividad.
                 </p>
             </div>
 
@@ -21,26 +21,26 @@ export default function ArtistRegisterPage() {
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <Card className="bg-card/30 border-cyber-pink/20 text-center p-4">
                     <Coins className="h-8 w-8 text-cyber-pink mx-auto mb-2" />
-                    <h3 className="font-semibold text-cyber-pink">Instant Payments</h3>
-                    <p className="text-sm text-muted-foreground">Get paid for every stream instantly</p>
+                    <h3 className="font-semibold text-cyber-pink">Pagos Instantaneos</h3>
+                    <p className="text-sm text-muted-foreground">Recibe un pago por cada transmisión al instante</p>
                 </Card>
 
                 <Card className="bg-card/30 border-cyber-pink/20 text-center p-4">
                     <Upload className="h-8 w-8 text-cyber-pink mx-auto mb-2" />
-                    <h3 className="font-semibold text-cyber-pink">Easy Upload</h3>
-                    <p className="text-sm text-muted-foreground">Upload your music with one click</p>
+                    <h3 className="font-semibold text-cyber-pink">Facil de Subir</h3>
+                    <p className="text-sm text-muted-foreground">Sube tu musica con un simple click</p>
                 </Card>
 
                 <Card className="bg-card/30 border-cyber-pink/20 text-center p-4">
                     <TrendingUp className="h-8 w-8 text-cyber-pink mx-auto mb-2" />
-                    <h3 className="font-semibold text-cyber-pink">Analytics</h3>
-                    <p className="text-sm text-muted-foreground">Track your performance and earnings</p>
+                    <h3 className="font-semibold text-cyber-pink">Analiticas</h3>
+                    <p className="text-sm text-muted-foreground">Realiza un seguimiento de tu desempeño y tus ganancias</p>
                 </Card>
 
                 <Card className="bg-card/30 border-cyber-pink/20 text-center p-4">
                     <Mic className="h-8 w-8 text-cyber-pink mx-auto mb-2" />
-                    <h3 className="font-semibold text-cyber-pink">Full Control</h3>
-                    <p className="text-sm text-muted-foreground">Own your music and rights completely</p>
+                    <h3 className="font-semibold text-cyber-pink">Control Completo</h3>
+                    <p className="text-sm text-muted-foreground">Se dueño de tu música y tus derechos por completo</p>
                 </Card>
             </div>
 
@@ -50,7 +50,7 @@ export default function ArtistRegisterPage() {
             {/* Additional Info */}
             <Card className="max-w-2xl mx-auto bg-card/30 border-border/50">
                 <CardHeader>
-                    <CardTitle className="text-center text-cyber-pink">Why Join as an Artist?</CardTitle>
+                    <CardTitle className="text-center text-cyber-pink">¿Por qué unirse como artista?</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                     <div className="grid gap-4">
@@ -59,9 +59,9 @@ export default function ArtistRegisterPage() {
                                 1
                             </div>
                             <div>
-                                <h4 className="font-semibold">Connect Wallet</h4>
+                                <h4 className="font-semibold">Conecta tu Wallet</h4>
                                 <p className="text-sm text-muted-foreground">
-                                    Link your MetaMask wallet to receive payments
+                                    Vincula tu billetera Rabby para recibir los pagos
                                 </p>
                             </div>
                         </div>
@@ -71,9 +71,9 @@ export default function ArtistRegisterPage() {
                                 2
                             </div>
                             <div>
-                                <h4 className="font-semibold">Create Artist Profile</h4>
+                                <h4 className="font-semibold">Crea un perfil de Artista</h4>
                                 <p className="text-sm text-muted-foreground">
-                                    Set up your artist profile with bio and genre
+                                    Configura tu perfil de artista con biografía y género
                                 </p>
                             </div>
                         </div>
@@ -83,9 +83,9 @@ export default function ArtistRegisterPage() {
                                 3
                             </div>
                             <div>
-                                <h4 className="font-semibold">Upload & Earn</h4>
+                                <h4 className="font-semibold">Sube y empieza a ganar</h4>
                                 <p className="text-sm text-muted-foreground">
-                                    Upload your music and start earning from streams
+                                    Sube tu música y comienza a ganar dinero con las transmisiones
                                 </p>
                             </div>
                         </div>
@@ -95,9 +95,9 @@ export default function ArtistRegisterPage() {
                                 4
                             </div>
                             <div>
-                                <h4 className="font-semibold">Track Performance</h4>
+                                <h4 className="font-semibold">Rastrea tu rendimiento</h4>
                                 <p className="text-sm text-muted-foreground">
-                                    Monitor your streams, earnings, and audience
+                                    Monitorea tus transmisiones, ganancias y audiencia
                                 </p>
                             </div>
                         </div>
