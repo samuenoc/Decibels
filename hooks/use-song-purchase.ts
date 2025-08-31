@@ -175,39 +175,19 @@ export function useSongPurchase() {
         return { success: false, message }
       }
 
-      // First check total songs in contract
-      let totalSongs
+      // Log contract info for debugging (but don't block purchase)
       try {
-        totalSongs = await contract.methods.getTotalSongs().call()
+        const totalSongs = await contract.methods.getTotalSongs().call()
         console.log('🎵 Total songs in contract:', totalSongs.toString())
+        console.log('🎵 Available song IDs: 0 to', Number(totalSongs) - 1)
       } catch (error) {
-        console.error('❌ Failed to get total songs:', error)
-        const message = "❌ Could not check contract songs."
-        setPurchaseMessage(message)
-        setMessageType("error")
-        return { success: false, message }
-      }
-
-      // Check if contract has any songs
-      if (Number(totalSongs) === 0) {
-        const message = "❌ No songs available in contract. Upload songs first."
-        setPurchaseMessage(message)
-        setMessageType("error")
-        return { success: false, message }
+        console.log('🔍 Could not check total songs:', error)
       }
 
       // Use the actual songId parameter (convert to BigInt for uint256)
       const songIdNumber = BigInt(songId)
       console.log('🎵 Attempting to purchase song ID:', songIdNumber.toString())
       console.log('🎵 Song ID type:', typeof songIdNumber)
-
-      // Verify song ID is within range
-      if (songIdNumber >= BigInt(totalSongs)) {
-        const message = `❌ Song ID ${songIdNumber} doesn't exist. Available: 0-${Number(totalSongs) - 1}`
-        setPurchaseMessage(message)
-        setMessageType("error")
-        return { success: false, message }
-      }
 
       console.log('💰 Song price:', price, 'ETH')
       console.log('💰 Price in wei:', priceInWei)
