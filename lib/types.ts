@@ -12,10 +12,13 @@ export interface Song {
   title: string
   artist_id: string
   artist_name: string
+  artist_wallet: string
+  price: number // Price in ETH
   audio_hash?: string // IPFS/Arweave hash for later
   duration?: number
   plays: number
   created_at: Date
+  isPurchased?: boolean
 }
 
 export interface PlaybackState {

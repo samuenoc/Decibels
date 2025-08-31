@@ -1,45 +1,26 @@
 "use client"
 
 import { useState, useCallback } from "react"
-import { useAuth } from "@/components/auth/auth-provider"
+import { useRouter } from "next/navigation"
 
 export function useValidation() {
-    const { isAuthenticated, isWalletConnected, isLoading } = useAuth()
-    const [showValidationModal, setShowValidationModal] = useState(false)
+    const router = useRouter()
+    const [isLoading, setIsLoading] = useState(false)
 
     const validateAccess = useCallback(() => {
-        if (isLoading) {
-            return false
-        }
-
-        if (!isWalletConnected) {
-            setShowValidationModal(true)
-            return false
-        }
-
+        const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true'
+        
         if (!isAuthenticated) {
-            setShowValidationModal(true)
+            // Redirect to listener registration (login page)
+            router.push('/listener/register')
             return false
         }
 
         return true
-    }, [isAuthenticated, isWalletConnected, isLoading])
-
-    const closeValidationModal = useCallback(() => {
-        setShowValidationModal(false)
-    }, [])
-
-    const handleValidationSuccess = useCallback(() => {
-        setShowValidationModal(false)
-    }, [])
+    }, [router])
 
     return {
         validateAccess,
-        showValidationModal,
-        closeValidationModal,
-        handleValidationSuccess,
-        isAuthenticated,
-        isWalletConnected,
         isLoading
     }
 }

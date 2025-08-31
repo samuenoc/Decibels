@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { SongCard } from "@/components/music/song-card"
 import { PlaybackControls } from "@/components/music/playback-controls"
 import { Input } from "@/components/ui/input"
@@ -16,51 +16,91 @@ const mockSongs: Song[] = [
     title: "Neon Dreams",
     artist_id: "artist_1",
     artist_name: "CyberSynth",
+    artist_wallet: "0xcadb505909332A4190aa82b12F09Ff3572aABb55",
+    price: 0.001, // 0.001 ETH
     duration: 245,
     plays: 15420,
     created_at: new Date("2024-01-15"),
+    isPurchased: false,
   },
   {
     id: "song_2",
     title: "Digital Horizon",
     artist_id: "artist_2",
     artist_name: "NeonBeats",
+    artist_wallet: "0x691C69830B74dfDFF1572B97FB42d11348E4869A",
+    price: 0.0015, // 0.0015 ETH
     duration: 198,
     plays: 8750,
     created_at: new Date("2024-01-20"),
+    isPurchased: false,
   },
   {
     id: "song_3",
     title: "Electric Pulse",
     artist_id: "artist_1",
     artist_name: "CyberSynth",
+    artist_wallet: "0x1080b094cFa7f8e0326530e99391A8A8da0336a1",
+    price: 0.0008, // 0.0008 ETH
     duration: 312,
     plays: 23100,
     created_at: new Date("2024-01-10"),
+    isPurchased: false,
   },
   {
     id: "song_4",
     title: "Cyber Rain",
     artist_id: "artist_3",
     artist_name: "DigitalDreamer",
+    artist_wallet: "0x1080b094cFa7f8e0326530e99391A8A8da0336a1",
+    price: 0.0012, // 0.0012 ETH
     duration: 267,
     plays: 5420,
     created_at: new Date("2024-01-25"),
+    isPurchased: false,
   },
   {
     id: "song_5",
     title: "Matrix Flow",
     artist_id: "artist_2",
     artist_name: "NeonBeats",
+    artist_wallet: "0xcadb505909332A4190aa82b12F09Ff3572aABb55",
+    price: 0.001, // 0.0009 ETH
     duration: 189,
     plays: 12300,
     created_at: new Date("2024-01-18"),
+    isPurchased: false,
   },
 ]
 
 export default function SongsPage() {
   const [searchQuery, setSearchQuery] = useState("")
   const [sortBy, setSortBy] = useState<"recent" | "popular" | "title">("popular")
+  const [selectedGenre, setSelectedGenre] = useState<"all" | "electronic" | "pop" | "hip-hop">("all")
+  const [songs, setSongs] = useState<Song[]>(mockSongs)
+  const [purchasedSongs, setPurchasedSongs] = useState<Set<string>>(new Set())
+
+  // Load purchased songs from localStorage on mount
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem('purchasedSongs')
+      if (stored) {
+        const purchasedArray = JSON.parse(stored)
+        const purchasedSet = new Set(purchasedArray as string[])
+        setPurchasedSongs(purchasedSet)
+        
+        // Update songs with purchase status
+        setSongs(prevSongs => 
+          prevSongs.map(song => ({
+            ...song,
+            isPurchased: purchasedSet.has(song.id)
+          }))
+        )
+      }
+    } catch (error) {
+      console.error('Error loading purchased songs:', error)
+    }
+  }, [])
 
   const [currentSong, setCurrentSong] = useState<Song | null>(null)
   const [isPlaying, setIsPlaying] = useState(false)
@@ -106,24 +146,46 @@ export default function SongsPage() {
     setVolume(newVolume)
   }
 
-  const filteredSongs = mockSongs
-    .filter(
-      (song) =>
-        song.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        song.artist_name.toLowerCase().includes(searchQuery.toLowerCase()),
-    )
-    .sort((a, b) => {
-      switch (sortBy) {
-        case "popular":
-          return b.plays - a.plays
-        case "recent":
-          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-        case "title":
-          return a.title.localeCompare(b.title)
-        default:
-          return 0
+  const handlePurchaseSuccess = useCallback((songId: string) => {
+    setPurchasedSongs(prev => {
+      const newSet = new Set(prev)
+      newSet.add(songId)
+      
+      // Update localStorage
+      try {
+        localStorage.setItem('purchasedSongs', JSON.stringify(Array.from(newSet)))
+      } catch (error) {
+        console.error('Error saving purchased songs:', error)
       }
+      
+      return newSet
     })
+    
+    // Update song purchase status
+    setSongs(prevSongs => 
+      prevSongs.map(song => 
+        song.id === songId ? { ...song, isPurchased: true } : song
+      )
+    )
+  }, [])
+
+  const filteredSongs = songs.filter((song) => {
+    const matchesSearch = song.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      song.artist_name.toLowerCase().includes(searchQuery.toLowerCase())
+    // For now, we'll just filter by search since genre is not in our Song type yet
+    return matchesSearch
+  }).sort((a, b) => {
+    switch (sortBy) {
+      case "popular":
+        return b.plays - a.plays
+      case "recent":
+        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      case "title":
+        return a.title.localeCompare(b.title)
+      default:
+        return 0
+    }
+  })
 
   const totalPlays = mockSongs.reduce((sum, song) => sum + song.plays, 0)
   const totalSongs = mockSongs.length
@@ -213,6 +275,52 @@ export default function SongsPage() {
                 A-Z
               </Button>
             </div>
+            <div className="flex gap-2">
+              <Button
+                variant={selectedGenre === "all" ? "default" : "outline"}
+                onClick={() => setSelectedGenre("all")}
+                className={
+                  selectedGenre === "all"
+                    ? "bg-cyber-purple hover:bg-cyber-purple/80"
+                    : "border-cyber-purple text-cyber-purple hover:bg-cyber-purple hover:text-black"
+                }
+              >
+                Todos
+              </Button>
+              <Button
+                variant={selectedGenre === "electronic" ? "default" : "outline"}
+                onClick={() => setSelectedGenre("electronic")}
+                className={
+                  selectedGenre === "electronic"
+                    ? "bg-cyber-pink hover:bg-cyber-pink/80"
+                    : "border-cyber-pink text-cyber-pink hover:bg-cyber-pink hover:text-black"
+                }
+              >
+                Electrónica
+              </Button>
+              <Button
+                variant={selectedGenre === "pop" ? "default" : "outline"}
+                onClick={() => setSelectedGenre("pop")}
+                className={
+                  selectedGenre === "pop"
+                    ? "bg-electric-blue hover:bg-electric-blue/80"
+                    : "border-electric-blue text-electric-blue hover:bg-electric-blue hover:text-black"
+                }
+              >
+                Pop
+              </Button>
+              <Button
+                variant={selectedGenre === "hip-hop" ? "default" : "outline"}
+                onClick={() => setSelectedGenre("hip-hop")}
+                className={
+                  selectedGenre === "hip-hop"
+                    ? "bg-electric-blue hover:bg-electric-blue/80"
+                    : "border-electric-blue text-electric-blue hover:bg-electric-blue hover:text-black"
+                }
+              >
+                Hip-Hop
+              </Button>
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -236,6 +344,7 @@ export default function SongsPage() {
               isLoading={currentSong?.id === song.id && isLoading}
               onPlay={handlePlay}
               onPause={handlePause}
+              onPurchaseSuccess={handlePurchaseSuccess}
             />
           ))
         )}
