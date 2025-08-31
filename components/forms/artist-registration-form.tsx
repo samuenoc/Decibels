@@ -4,13 +4,11 @@
 declare global {
   interface Window {
     rabby?: any
-    ethereum?: any
   }
 }
 
-import Link from "next/link"
-
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -22,6 +20,7 @@ import { toast } from "@/hooks/use-toast"
 
 export function ArtistRegistrationForm() {
   const { register, isWalletConnected, connectWallet } = useAuth()
+  const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
   const [isAccountCreated, setIsAccountCreated] = useState(false)
   const [formData, setFormData] = useState({
@@ -142,6 +141,10 @@ export function ArtistRegistrationForm() {
             description: "¡Tu wallet se ha conectado exitosamente!",
           })
 
+          // Redirección automática al dashboard de artista
+          setTimeout(() => {
+            router.push("http://localhost:3000/artist/dashboard")
+          }, 1500) // Espera 1.5 segundos para que el usuario vea el toast de éxito
         }
       } else {
         toast({
@@ -318,12 +321,6 @@ export function ArtistRegistrationForm() {
               <Wallet className="h-4 w-4 mr-2" />
               {isWalletConnected ? "Wallet conectada" : "Conectar a Rabby"}
             </Button>
-
-            <div className="text-center mt-4">
-              <Link href="/artist/dashboard" className="text-cyber-pink underline hover:text-cyber-pink/80">
-                Ir al Dashboard
-              </Link>
-            </div>
           </div>
         )}
       </CardContent>

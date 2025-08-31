@@ -1,6 +1,14 @@
 "use client"
 
+// Extender la interfaz de Window para incluir 'rabby'
+declare global {
+  interface Window {
+    rabby?: any
+  }
+}
+
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -11,6 +19,7 @@ import { toast } from "@/hooks/use-toast"
 
 export function ListenerRegistrationForm() {
   const { register, isWalletConnected, connectWallet } = useAuth()
+  const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
   const [isAccountCreated, setIsAccountCreated] = useState(false)
   const [formData, setFormData] = useState({
@@ -21,8 +30,8 @@ export function ListenerRegistrationForm() {
 
   const handleWalletConnect = async () => {
     try {
-      if (typeof window.ethereum !== "undefined") {
-        const accounts = await window.ethereum.request({
+      if (typeof window.rabby !== "undefined") {
+        const accounts = await window.rabby.request({
           method: "eth_requestAccounts",
         })
 
@@ -30,21 +39,21 @@ export function ListenerRegistrationForm() {
           const address = accounts[0]
           connectWallet(address)
           toast({
-            title: "Wallet Conectada",
-            description: "¡Tu wallet se ha conectado correctamente!",
+            title: "Wallet conectada",
+            description: "¡Tu wallet se ha conectado exitosamente!",
           })
         }
       } else {
         toast({
-          title: "MetaMask no encontrada",
-          description: "Por favor instala MetaMask para conectar tu wallet.",
+          title: "Rabby no encontrada",
+          description: "Por favor instala la wallet de Rabby para continuar y conectar",
           variant: "destructive",
         })
       }
     } catch (error) {
       toast({
-        title: "Error de conexión",
-        description: "No se pudo conectar la wallet. Intenta nuevamente.",
+        title: "Conexión fallida",
+        description: "Fallo al conectar la wallet, intenta de nuevo",
         variant: "destructive",
       })
     }
@@ -56,7 +65,7 @@ export function ListenerRegistrationForm() {
     if (formData.password !== formData.confirmPassword) {
       toast({
         title: "Contraseñas no coinciden",
-        description: "Las contraseñas no coinciden. Intenta nuevamente.",
+        description: "Las contraseñas no son iguales. Intenta de nuevo.",
         variant: "destructive",
       })
       return
@@ -74,18 +83,18 @@ export function ListenerRegistrationForm() {
         setIsAccountCreated(true)
         toast({
           title: "Cuenta creada",
-          description: "¡Tu cuenta de oyente se ha creado exitosamente!",
+          description: "¡Tu cuenta de oyente se creó exitosamente!",
         })
       } else {
         toast({
-          title: "Registro fallido",
-          description: "No se pudo crear la cuenta. Intenta nuevamente.",
+          title: "Error en el registro",
+          description: "No se pudo crear la cuenta de oyente. Intenta de nuevo.",
           variant: "destructive",
         })
       }
     } catch (error) {
       toast({
-        title: "Error de registro",
+        title: "Error en el registro",
         description: "Ocurrió un error durante el registro.",
         variant: "destructive",
       })
@@ -104,7 +113,39 @@ export function ListenerRegistrationForm() {
       return
     }
 
-    handleWalletConnect()
+    try {
+      if (typeof window.rabby !== "undefined") {
+        const accounts = await window.rabby.request({
+          method: "eth_requestAccounts",
+        })
+
+        if (accounts.length > 0) {
+          const address = accounts[0]
+          connectWallet(address)
+          toast({
+            title: "Wallet conectada",
+            description: "¡Tu wallet se ha conectado exitosamente!",
+          })
+
+          // Redirección automática al dashboard de oyente
+          setTimeout(() => {
+            router.push("http://localhost:3000/listener/dashboard")
+          }, 1500) // Espera 1.5 segundos para que el usuario vea el toast de éxito
+        }
+      } else {
+        toast({
+          title: "Rabby no encontrada",
+          description: "Por favor instala Rabby para conectar tu wallet.",
+          variant: "destructive",
+        })
+      }
+    } catch (error) {
+      toast({
+        title: "Conexión fallida",
+        description: "No se pudo conectar la wallet. Intenta de nuevo.",
+        variant: "destructive",
+      })
+    }
   }
 
   const handleInputChange = (field: string, value: string) => {
@@ -183,12 +224,12 @@ export function ListenerRegistrationForm() {
               {isLoading ? (
                 <div className="flex items-center">
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
-                  Creando cuenta...
+                  Creando cuenta de oyente...
                 </div>
               ) : (
                 <>
                   <User className="h-4 w-4 mr-2" />
-                  Crear cuenta
+                  Crear cuenta de oyente
                 </>
               )}
             </Button>
@@ -201,7 +242,7 @@ export function ListenerRegistrationForm() {
             <div className="text-center">
               <h3 className="font-semibold text-foreground mb-2">Paso 2: Conectar Wallet</h3>
               <p className="text-sm text-muted-foreground mb-4">
-                Conecta tu wallet para completar el registro
+                Conecta tu wallet de Rabby para completar el registro
               </p>
             </div>
 
@@ -214,7 +255,7 @@ export function ListenerRegistrationForm() {
                 }`}
             >
               <Wallet className="h-4 w-4 mr-2" />
-              {isWalletConnected ? "Wallet Conectada" : "Conectar Wallet"}
+              {isWalletConnected ? "Wallet conectada" : "Conectar a Rabby"}
             </Button>
           </div>
         )}
