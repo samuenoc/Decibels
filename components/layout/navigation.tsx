@@ -36,7 +36,7 @@ export function Navigation() {
           <div className="hidden md:flex items-center gap-4">
             <Link href="/songs">
               <Button variant="ghost" className="text-foreground hover:text-cyber-purple">
-                Songs
+                Canciones
               </Button>
             </Link>
 
@@ -46,7 +46,7 @@ export function Navigation() {
                   <Link href="/artist/upload">
                     <Button variant="ghost" className="text-foreground hover:text-cyber-pink">
                       <Upload className="h-4 w-4 mr-2" />
-                      <span className="hidden lg:inline">Upload</span>
+                      <span className="hidden lg:inline">Subir Cancion</span>
                     </Button>
                   </Link>
                 )}
@@ -68,7 +68,7 @@ export function Navigation() {
             {isAuthenticated ? (
               <div className="flex items-center gap-2">
                 <span className="text-sm text-muted-foreground hidden lg:inline">
-                  Welcome, {user?.username}
+                  Bienvenido, {user?.username}
                 </span>
                 <Button
                   variant="ghost"
@@ -92,12 +92,12 @@ export function Navigation() {
                   {userMode === "listener" ? (
                     <>
                       <User className="h-4 w-4 mr-2" />
-                      <span className="hidden sm:inline">Join as Listener</span>
+                      <span className="hidden sm:inline">Ingresa como listener</span>
                     </>
                   ) : (
                     <>
                       <Mic className="h-4 w-4 mr-2" />
-                      <span className="hidden sm:inline">Become Artist</span>
+                      <span className="hidden sm:inline">Ingresa como Artista</span>
                     </>
                   )}
                 </Button>
@@ -123,7 +123,7 @@ export function Navigation() {
               <Link href="/songs" onClick={closeMobileMenu}>
                 <Button variant="ghost" className="w-full justify-start text-foreground hover:text-cyber-purple">
                   <Music className="h-4 w-4 mr-2" />
-                  Songs
+                  Canciones
                 </Button>
               </Link>
 
@@ -133,7 +133,7 @@ export function Navigation() {
                     <Link href="/artist/upload" onClick={closeMobileMenu}>
                       <Button variant="ghost" className="w-full justify-start text-foreground hover:text-cyber-pink">
                         <Upload className="h-4 w-4 mr-2" />
-                        Upload
+                        Subir Cancion
                       </Button>
                     </Link>
                   )}
@@ -180,12 +180,12 @@ export function Navigation() {
                     {userMode === "listener" ? (
                       <>
                         <User className="h-4 w-4 mr-2" />
-                        Join as Listener
+                        Ingresa como Listener
                       </>
                     ) : (
                       <>
                         <Mic className="h-4 w-4 mr-2" />
-                        Become Artist
+                        Ingresa como Artista
                       </>
                     )}
                   </Button>

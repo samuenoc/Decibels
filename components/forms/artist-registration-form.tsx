@@ -1,6 +1,6 @@
 "use client"
 
-// Extend the Window interface to include 'rabby'
+// Extender la interfaz de Window para incluir 'rabby'
 declare global {
   interface Window {
     rabby?: any
@@ -45,13 +45,13 @@ export function ArtistRegistrationForm() {
           const address = accounts[0]
           connectWallet(address)
           toast({
-            title: "Wallet Connected",
-            description: "Your wallet has been successfully connected!",
+            title: "Wallet conectada",
+            description: "¡Tu wallet se ha conectado exitosamente!",
           })
         }
       } else {
         toast({
-          title: "MetaMask Not Found",
+          title: "Rabby no encontrada",
           description: "Por favor instala la wallet de Rabby para continuar y conectar",
           variant: "destructive",
         })
@@ -59,7 +59,7 @@ export function ArtistRegistrationForm() {
     } catch (error) {
       toast({
         title: "Conexión fallida",
-        description: "Fallo al conectar a la wallet, intenta de nuevo",
+        description: "Fallo al conectar la wallet, intenta de nuevo",
         variant: "destructive",
       })
     }
@@ -70,8 +70,8 @@ export function ArtistRegistrationForm() {
 
     if (formData.password !== formData.confirmPassword) {
       toast({
-        title: "Password Mismatch",
-        description: "Passwords do not match. Please try again.",
+        title: "Contraseñas no coinciden",
+        description: "Las contraseñas no son iguales. Intenta de nuevo.",
         variant: "destructive",
       })
       return
@@ -79,8 +79,8 @@ export function ArtistRegistrationForm() {
 
     if (!formData.artistName.trim()) {
       toast({
-        title: "Artist Name Required",
-        description: "Please enter your artist name.",
+        title: "Nombre artístico requerido",
+        description: "Por favor ingresa tu nombre artístico.",
         variant: "destructive",
       })
       return
@@ -97,20 +97,20 @@ export function ArtistRegistrationForm() {
       if (success) {
         setIsAccountCreated(true)
         toast({
-          title: "Account Created",
-          description: "Your artist account has been created successfully!",
+          title: "Cuenta creada",
+          description: "¡Tu cuenta de artista se creó exitosamente!",
         })
       } else {
         toast({
-          title: "Registration Failed",
-          description: "Failed to create artist account. Please try again.",
+          title: "Error en el registro",
+          description: "No se pudo crear la cuenta de artista. Intenta de nuevo.",
           variant: "destructive",
         })
       }
     } catch (error) {
       toast({
-        title: "Registration Error",
-        description: "An error occurred during registration.",
+        title: "Error en el registro",
+        description: "Ocurrió un error durante el registro.",
         variant: "destructive",
       })
     } finally {
@@ -121,8 +121,8 @@ export function ArtistRegistrationForm() {
   const handleConnectWallet = async () => {
     if (!isAccountCreated) {
       toast({
-        title: "Account Required",
-        description: "Please create your account first.",
+        title: "Cuenta requerida",
+        description: "Por favor crea tu cuenta primero.",
         variant: "destructive",
       })
       return
@@ -138,22 +138,22 @@ export function ArtistRegistrationForm() {
           const address = accounts[0]
           connectWallet(address)
           toast({
-            title: "Wallet Connected",
-            description: "Your wallet has been successfully connected!",
+            title: "Wallet conectada",
+            description: "¡Tu wallet se ha conectado exitosamente!",
           })
 
         }
       } else {
         toast({
-          title: "Rabby Not Found",
-          description: "Please install Rabby to connect your wallet.",
+          title: "Rabby no encontrada",
+          description: "Por favor instala Rabby para conectar tu wallet.",
           variant: "destructive",
         })
       }
     } catch (error) {
       toast({
-        title: "Connection Failed",
-        description: "Failed to connect wallet. Please try again.",
+        title: "Conexión fallida",
+        description: "No se pudo conectar la wallet. Intenta de nuevo.",
         variant: "destructive",
       })
     }
@@ -170,108 +170,108 @@ export function ArtistRegistrationForm() {
           <Mic className="h-6 w-6 text-black" />
         </div>
         <CardTitle className="text-2xl font-bold text-cyber-pink">
-          Join as Artist
+          Unirse como Artista
         </CardTitle>
         <p className="text-sm text-muted-foreground">
-          Create your artist account to upload and monetize your music
+          Crea tu cuenta de artista para subir y monetizar tu música
         </p>
       </CardHeader>
 
       <CardContent className="space-y-6">
-        {/* Account Creation Section */}
+        {/* Sección de creación de cuenta */}
         <div className="space-y-4">
           <div className="text-center">
-            <h3 className="font-semibold text-foreground mb-2">Step 1: Create Artist Account</h3>
+            <h3 className="font-semibold text-foreground mb-2">Paso 1: Crear cuenta de artista</h3>
             <p className="text-sm text-muted-foreground mb-4">
-              Fill in your details to create an artist account
+              Completa tus datos para crear una cuenta de artista
             </p>
           </div>
 
           <form onSubmit={handleCreateAccount} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">Correo</Label>
               <Input
                 id="email"
                 type="email"
                 value={formData.email}
                 onChange={(e) => handleInputChange("email", e.target.value)}
-                placeholder="Enter your email"
+                placeholder="Ingresa tu correo"
                 required
                 className="bg-input/50 border-border focus:border-cyber-pink"
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="username">Username</Label>
+              <Label htmlFor="username">Usuario</Label>
               <Input
                 id="username"
                 type="text"
                 value={formData.username}
                 onChange={(e) => handleInputChange("username", e.target.value)}
-                placeholder="Choose a username"
+                placeholder="Elige un nombre de usuario"
                 required
                 className="bg-input/50 border-border focus:border-cyber-pink"
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="artistName">Artist Name</Label>
+              <Label htmlFor="artistName">Nombre artístico</Label>
               <Input
                 id="artistName"
                 type="text"
                 value={formData.artistName}
                 onChange={(e) => handleInputChange("artistName", e.target.value)}
-                placeholder="Your artist/stage name"
+                placeholder="Tu nombre o seudónimo artístico"
                 required
                 className="bg-input/50 border-border focus:border-cyber-pink"
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="genre">Primary Genre</Label>
+              <Label htmlFor="genre">Género principal</Label>
               <Input
                 id="genre"
                 type="text"
                 value={formData.genre}
                 onChange={(e) => handleInputChange("genre", e.target.value)}
-                placeholder="e.g., Electronic, Rock, Hip-Hop"
+                placeholder="Ej: Electrónica, Rock, Hip-Hop"
                 className="bg-input/50 border-border focus:border-cyber-pink"
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="bio">Artist Bio</Label>
+              <Label htmlFor="bio">Biografía del artista</Label>
               <Textarea
                 id="bio"
                 value={formData.bio}
                 onChange={(e) => handleInputChange("bio", e.target.value)}
-                placeholder="Tell us about your music and style..."
+                placeholder="Cuéntanos sobre tu música y estilo..."
                 rows={3}
                 className="bg-input/50 border-border focus:border-cyber-pink"
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">Contraseña</Label>
               <Input
                 id="password"
                 type="password"
                 value={formData.password}
                 onChange={(e) => handleInputChange("password", e.target.value)}
-                placeholder="Create a password"
+                placeholder="Crea una contraseña"
                 required
                 className="bg-input/50 border-border focus:border-cyber-pink"
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Confirm Password</Label>
+              <Label htmlFor="confirmPassword">Confirmar contraseña</Label>
               <Input
                 id="confirmPassword"
                 type="password"
                 value={formData.confirmPassword}
                 onChange={(e) => handleInputChange("confirmPassword", e.target.value)}
-                placeholder="Confirm your password"
+                placeholder="Repite tu contraseña"
                 required
                 className="bg-input/50 border-border focus:border-cyber-pink"
               />
@@ -285,26 +285,25 @@ export function ArtistRegistrationForm() {
               {isLoading ? (
                 <div className="flex items-center">
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
-                  Creating Artist Account...
+                  Creando cuenta de artista...
                 </div>
               ) : (
                 <>
                   <Mic className="h-4 w-4 mr-2" />
-                  Create Artist Account
+                  Crear cuenta de artista
                 </>
               )}
             </Button>
           </form>
         </div>
 
-        {/* Wallet Connection Section */}
-        {/* Wallet Connection Section */}
+        {/* Sección de conexión de wallet */}
         {isAccountCreated && (
           <div className="space-y-4">
             <div className="text-center">
-              <h3 className="font-semibold text-foreground mb-2">Step 2: Connect Wallet</h3>
+              <h3 className="font-semibold text-foreground mb-2">Paso 2: Conectar Wallet</h3>
               <p className="text-sm text-muted-foreground mb-4">
-                Connect your MetaMask wallet to complete registration
+                Conecta tu wallet de Rabby para completar el registro
               </p>
             </div>
 
@@ -317,12 +316,12 @@ export function ArtistRegistrationForm() {
                 }`}
             >
               <Wallet className="h-4 w-4 mr-2" />
-              {isWalletConnected ? "Wallet Connected" : "Conectar a Rabby"}
+              {isWalletConnected ? "Wallet conectada" : "Conectar a Rabby"}
             </Button>
 
             <div className="text-center mt-4">
               <Link href="/artist/dashboard" className="text-cyber-pink underline hover:text-cyber-pink/80">
-                Go to Dashboard
+                Ir al Dashboard
               </Link>
             </div>
           </div>
