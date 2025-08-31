@@ -67,12 +67,12 @@ export function ArtistDashboard() {
           <CardHeader className="pb-3">
             <CardTitle className="text-neon-green flex items-center gap-2">
               <DollarSign className="h-5 w-5" />
-              Total Earnings
+              Ganancias Totales
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold text-neon-green">{formatCurrency(totalEarnings)}</div>
-            <p className="text-sm text-muted-foreground">+{monthlyGrowth}% this month</p>
+            <p className="text-sm text-muted-foreground">+{monthlyGrowth}% este mes</p>
           </CardContent>
         </Card>
 
@@ -80,12 +80,12 @@ export function ArtistDashboard() {
           <CardHeader className="pb-3">
             <CardTitle className="text-cyber-purple flex items-center gap-2">
               <TrendingUp className="h-5 w-5" />
-              Total Plays
+              Total de reproducciones
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold text-cyber-purple">{formatPlays(totalPlays)}</div>
-            <p className="text-sm text-muted-foreground">Across all songs</p>
+            <p className="text-sm text-muted-foreground">En todas las canciones</p>
           </CardContent>
         </Card>
 
@@ -93,12 +93,12 @@ export function ArtistDashboard() {
           <CardHeader className="pb-3">
             <CardTitle className="text-cyber-pink flex items-center gap-2">
               <Music className="h-5 w-5" />
-              Songs Released
+              Canciones lanzadas
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold text-cyber-pink">{totalSongs}</div>
-            <p className="text-sm text-muted-foreground">Published tracks</p>
+            <p className="text-sm text-muted-foreground">Canciones publicadas</p>
           </CardContent>
         </Card>
 
@@ -106,12 +106,12 @@ export function ArtistDashboard() {
           <CardHeader className="pb-3">
             <CardTitle className="text-electric-blue flex items-center gap-2">
               <Users className="h-5 w-5" />
-              Monthly Listeners
+              Oyentes mensuales
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold text-electric-blue">2.4K</div>
-            <p className="text-sm text-muted-foreground">Unique listeners</p>
+            <p className="text-sm text-muted-foreground">Oyentes únicos</p>
           </CardContent>
         </Card>
       </div>
@@ -153,9 +153,9 @@ export function ArtistDashboard() {
         <CardHeader>
           <CardTitle className="text-neon-green flex items-center gap-2">
             <Coins className="h-5 w-5" />
-            Recent Earnings
+            Ganancias recientes
           </CardTitle>
-          <CardDescription>Your latest streaming revenue</CardDescription>
+          <CardDescription>Tus ingresos más recientes por streaming</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">

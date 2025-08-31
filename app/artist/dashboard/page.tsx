@@ -8,10 +8,10 @@ export default function ArtistDashboardPage() {
       {/* Header */}
       <div className="text-center space-y-4">
         <h1 className="text-4xl font-bold text-balance">
-          <span className="text-cyber-pink">Artist</span> <span className="text-cyber-pink">Dashboard</span>
+          <span className="text-cyber-pink">Panel de control del</span> <span className="text-cyber-pink">Artista</span>
         </h1>
         <p className="text-xl text-muted-foreground max-w-2xl mx-auto text-balance">
-          Monitor your music performance, track earnings, and manage your releases.
+          Monitorea tu desempeño musical, lleva un registro de tus ganancias y administra tus lanzamientos.
         </p>
       </div>
 
