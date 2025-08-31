@@ -105,16 +105,16 @@ export function ArtistRegistrationForm() {
         localStorage.setItem('isAuthenticated', 'true')
         localStorage.setItem('userType', 'artist')
         localStorage.setItem('userEmail', formData.email)
-        
+
         // Trigger navigation update
         window.dispatchEvent(new Event('authStateChanged'))
-        
+
         setIsAccountCreated(true)
         toast({
           title: "Cuenta creada",
           description: "¡Tu cuenta de artista se creó exitosamente!",
         })
-        
+
         // Redirect to artist dashboard after showing success message
         setTimeout(() => {
           router.push("/artist/dashboard")
@@ -229,6 +229,7 @@ export function ArtistRegistrationForm() {
 
         if (accounts.length > 0) {
           const address = accounts[0]
+          console.log(address)
           setIsLoginWalletConnected(true)
           toast({
             title: "Wallet conectada",
