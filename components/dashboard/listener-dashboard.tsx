@@ -1,11 +1,11 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { SongCard } from "@/components/music/song-card"
 import { usePlayback } from "@/hooks/use-playback"
-import { Music, Heart, Clock, TrendingUp } from "lucide-react"
+import { Music, Heart, Clock, TrendingUp, Wallet, RefreshCw } from "lucide-react"
 import type { Song } from "@/lib/types"
 
 // Mock data for listener
@@ -63,13 +63,120 @@ const mockRecommended: Song[] = [
   },
 ]
 
+// Types para Rabby Wallet
+interface WalletBalance {
+  balance: string
+  address: string
+  isConnected: boolean
+}
+
 export function ListenerDashboard() {
   const [activeTab, setActiveTab] = useState<"recent" | "favorites" | "recommended">("recent")
+  const [walletBalance, setWalletBalance] = useState<WalletBalance>({
+    balance: "0",
+    address: "",
+    isConnected: false
+  })
+  const [isLoadingWallet, setIsLoadingWallet] = useState(false)
   const playback = usePlayback([...mockRecentlyPlayed, ...mockFavorites, ...mockRecommended])
 
   const totalListeningTime = 1247 // minutes
   const songsPlayed = 156
   const favoriteArtists = 12
+
+  // Función para conectar y obtener balance de Rabby
+  const connectWallet = async () => {
+    if (typeof window === 'undefined' || !window.rabby) {
+      console.error('Rabby wallet not found')
+      return
+    }
+
+    setIsLoadingWallet(true)
+    try {
+      // Solicitar conexión a la wallet
+      const accounts = await window.rabby.request({
+        method: 'eth_requestAccounts'
+      })
+
+      if (accounts && accounts.length > 0) {
+        const address = accounts[0]
+
+        // Obtener balance
+        const balance = await window.rabby.request({
+          method: 'eth_getBalance',
+          params: [address, 'latest']
+        })
+
+        // Convertir de wei a ETH
+        const balanceInEth = parseFloat(balance) / Math.pow(10, 18)
+
+        setWalletBalance({
+          balance: balanceInEth.toFixed(4),
+          address: address,
+          isConnected: true
+        })
+      }
+    } catch (error) {
+      console.error('Error connecting to wallet:', error)
+    } finally {
+      setIsLoadingWallet(false)
+    }
+  }
+
+  // Función para refrescar balance
+  const refreshBalance = async () => {
+    if (!walletBalance.isConnected || !walletBalance.address) return
+
+    setIsLoadingWallet(true)
+    try {
+      const balance = await window.rabby.request({
+        method: 'eth_getBalance',
+        params: [walletBalance.address, 'latest']
+      })
+
+      const balanceInEth = parseFloat(balance) / Math.pow(10, 18)
+      setWalletBalance(prev => ({
+        ...prev,
+        balance: balanceInEth.toFixed(4)
+      }))
+    } catch (error) {
+      console.error('Error refreshing balance:', error)
+    } finally {
+      setIsLoadingWallet(false)
+    }
+  }
+
+  // Verificar conexión existente al cargar
+  useEffect(() => {
+    const checkConnection = async () => {
+      if (typeof window !== 'undefined' && window.rabby) {
+        try {
+          const accounts = await window.rabby.request({
+            method: 'eth_accounts'
+          })
+
+          if (accounts && accounts.length > 0) {
+            const address = accounts[0]
+            const balance = await window.rabby.request({
+              method: 'eth_getBalance',
+              params: [address, 'latest']
+            })
+
+            const balanceInEth = parseFloat(balance) / Math.pow(10, 18)
+            setWalletBalance({
+              balance: balanceInEth.toFixed(4),
+              address: address,
+              isConnected: true
+            })
+          }
+        } catch (error) {
+          console.error('Error checking wallet connection:', error)
+        }
+      }
+    }
+
+    checkConnection()
+  }, [])
 
   const getCurrentSongs = () => {
     switch (activeTab) {
@@ -84,8 +191,73 @@ export function ListenerDashboard() {
     }
   }
 
+  const formatAddress = (address: string) => {
+    return `${address.slice(0, 6)}...${address.slice(-4)}`
+  }
+
   return (
     <div className="space-y-8">
+      {/* Wallet Balance Card - Positioned at top right or as first card */}
+      {walletBalance.isConnected && (
+        <Card className="bg-gradient-to-r from-cyber-purple/10 to-electric-blue/10 border-cyber-purple/30">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-cyber-purple flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Wallet className="h-5 w-5" />
+                Wallet Balance
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={refreshBalance}
+                disabled={isLoadingWallet}
+                className="h-8 w-8 p-0 text-cyber-purple hover:bg-cyber-purple/10"
+              >
+                <RefreshCw className={`h-4 w-4 ${isLoadingWallet ? 'animate-spin' : ''}`} />
+              </Button>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-cyber-purple mb-1">
+              {walletBalance.balance} ETH
+            </div>
+            <p className="text-xs text-muted-foreground">
+              {formatAddress(walletBalance.address)}
+            </p>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Connect Wallet Button - Only show if not connected */}
+      {!walletBalance.isConnected && (
+        <Card className="bg-card/30 border-cyber-purple/20">
+          <CardContent className="p-6 text-center">
+            <Wallet className="h-8 w-8 text-cyber-purple mx-auto mb-3" />
+            <h3 className="text-lg font-semibold mb-2 text-cyber-purple">Connect Your Wallet</h3>
+            <p className="text-sm text-muted-foreground mb-4">
+              Connect your Rabby wallet to see your balance and unlock more features
+            </p>
+            <Button
+              onClick={connectWallet}
+              disabled={isLoadingWallet}
+              className="bg-cyber-purple hover:bg-cyber-purple/80"
+            >
+              {isLoadingWallet ? (
+                <>
+                  <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                  Connecting...
+                </>
+              ) : (
+                <>
+                  <Wallet className="h-4 w-4 mr-2" />
+                  Connect Rabby Wallet
+                </>
+              )}
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Stats Cards */}
       <div className="grid md:grid-cols-3 gap-6">
         <Card className="bg-card/50 border-cyber-purple/20">
