@@ -1,18 +1,53 @@
 "use client"
 
-import { useState } from "react"
+// Extend Window interface to include 'rabby'
+declare global {
+  interface Window {
+    rabby?: any
+  }
+}
+
+import { useState, useEffect } from "react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Music, User, Upload, BarChart3, LogOut, Mic, Menu, X } from "lucide-react"
-import { WalletButton } from "@/components/ui/wallet-button"
-import { useAuth } from "@/components/auth/auth-provider"
-import { useUserMode } from "@/components/providers/user-mode-provider"
+import { toast } from "@/hooks/use-toast"
 
 export function Navigation() {
-  const { user, isAuthenticated, logout } = useAuth()
-  const { userMode } = useUserMode()
-  const [userRole, setUserRole] = useState<"listener" | "artist">(user?.role || "listener")
+  const router = useRouter()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [userType, setUserType] = useState<"listener" | "artist" | null>(null)
+  const [userEmail, setUserEmail] = useState<string | null>(null)
+
+  // Check localStorage on component mount and when storage changes
+  useEffect(() => {
+    const updateAuthState = () => {
+      const authStatus = localStorage.getItem('isAuthenticated')
+      const storedUserType = localStorage.getItem('userType') as 'listener' | 'artist' | null
+      const storedUserEmail = localStorage.getItem('userEmail')
+      
+      setIsAuthenticated(authStatus === 'true')
+      setUserType(storedUserType)
+      setUserEmail(storedUserEmail)
+    }
+
+    // Initial check
+    updateAuthState()
+
+    // Listen for storage changes (when localStorage is updated)
+    window.addEventListener('storage', updateAuthState)
+    
+    // Custom event listener for same-tab localStorage changes
+    const handleAuthChange = () => updateAuthState()
+    window.addEventListener('authStateChanged', handleAuthChange)
+
+    return () => {
+      window.removeEventListener('storage', updateAuthState)
+      window.removeEventListener('authStateChanged', handleAuthChange)
+    }
+  }, [])
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen)
@@ -20,6 +55,45 @@ export function Navigation() {
 
   const closeMobileMenu = () => {
     setIsMobileMenuOpen(false)
+  }
+
+  const handleLogout = async () => {
+    try {
+      // Clear localStorage
+      localStorage.removeItem('isAuthenticated')
+      localStorage.removeItem('userType')
+      localStorage.removeItem('userEmail')
+      
+      // Update local state
+      setIsAuthenticated(false)
+      setUserType(null)
+      setUserEmail(null)
+      
+      // Disconnect from Rabby wallet
+      if (typeof window !== 'undefined' && window.rabby) {
+        try {
+          await window.rabby.request({
+            method: 'wallet_disconnect'
+          })
+        } catch (error) {
+          console.log('Wallet disconnect failed:', error)
+        }
+      }
+      
+      toast({
+        title: "Sesión cerrada",
+        description: "Has cerrado sesión exitosamente.",
+      })
+      
+      // Redirect to home page
+      router.push('/')
+    } catch (error) {
+      toast({
+        title: "Error al cerrar sesión",
+        description: "Ocurrió un error al cerrar la sesión.",
+        variant: "destructive",
+      })
+    }
   }
 
   return (
@@ -42,7 +116,7 @@ export function Navigation() {
 
             {isAuthenticated && (
               <>
-                {user?.role === "artist" && (
+                {userType === "artist" && (
                   <Link href="/artist/upload">
                     <Button variant="ghost" className="text-foreground hover:text-cyber-pink">
                       <Upload className="h-4 w-4 mr-2" />
@@ -50,10 +124,10 @@ export function Navigation() {
                     </Button>
                   </Link>
                 )}
-                <Link href={user?.role === "artist" ? "/artist/dashboard" : "/listener/dashboard"}>
+                <Link href={userType === "artist" ? "/artist/dashboard" : "/listener/dashboard"}>
                   <Button
                     variant="outline"
-                    className={`${user?.role === "artist"
+                    className={`${userType === "artist"
                       ? "border-cyber-pink text-cyber-pink hover:bg-cyber-pink hover:text-black glow-pink"
                       : "border-cyber-purple text-cyber-purple hover:bg-cyber-purple hover:text-black glow-purple"
                       } bg-transparent`}
@@ -68,40 +142,29 @@ export function Navigation() {
             {isAuthenticated ? (
               <div className="flex items-center gap-2">
                 <span className="text-sm text-muted-foreground hidden lg:inline">
-                  Bienvenido, {user?.username}
+                  Bienvenido, {userEmail?.split('@')[0]}
                 </span>
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={logout}
+                  onClick={handleLogout}
                   className="text-foreground hover:text-red-400"
                 >
                   <LogOut className="h-4 w-4" />
                 </Button>
               </div>
             ) : (
-              <Link href={userMode === "listener" ? "/listener/register" : "/artist/register"}>
-                <Button
-                  variant="outline"
-                  className={
-                    userMode === "listener"
-                      ? "border-cyber-purple text-cyber-purple hover:bg-cyber-purple hover:text-black glow-purple bg-transparent"
-                      : "border-cyber-pink text-cyber-pink hover:bg-cyber-pink hover:text-black glow-pink bg-transparent"
-                  }
-                >
-                  {userMode === "listener" ? (
-                    <>
-                      <User className="h-4 w-4 mr-2" />
-                      <span className="hidden sm:inline">Ingresa como listener</span>
-                    </>
-                  ) : (
-                    <>
-                      <Mic className="h-4 w-4 mr-2" />
-                      <span className="hidden sm:inline">Ingresa como Artista</span>
-                    </>
-                  )}
-                </Button>
-              </Link>
+              <div className="flex items-center gap-2">
+                <Link href="/listener/register">
+                  <Button
+                    variant="outline"
+                    className="border-cyber-purple text-cyber-purple hover:bg-cyber-purple hover:text-black glow-purple bg-transparent"
+                  >
+                    <User className="h-4 w-4 mr-2" />
+                    <span className="hidden sm:inline">Login</span>
+                  </Button>
+                </Link>
+              </div>
             )}
           </div>
 
@@ -129,7 +192,7 @@ export function Navigation() {
 
               {isAuthenticated && (
                 <>
-                  {user?.role === "artist" && (
+                  {userType === "artist" && (
                     <Link href="/artist/upload" onClick={closeMobileMenu}>
                       <Button variant="ghost" className="w-full justify-start text-foreground hover:text-cyber-pink">
                         <Upload className="h-4 w-4 mr-2" />
@@ -137,10 +200,10 @@ export function Navigation() {
                       </Button>
                     </Link>
                   )}
-                  <Link href={user?.role === "artist" ? "/artist/dashboard" : "/listener/dashboard"} onClick={closeMobileMenu}>
+                  <Link href={userType === "artist" ? "/artist/dashboard" : "/listener/dashboard"} onClick={closeMobileMenu}>
                     <Button
                       variant="outline"
-                      className={`w-full justify-start ${user?.role === "artist"
+                      className={`w-full justify-start ${userType === "artist"
                         ? "border-cyber-pink text-cyber-pink hover:bg-cyber-pink hover:text-black glow-pink"
                         : "border-cyber-purple text-cyber-purple hover:bg-cyber-purple hover:text-black glow-purple"
                         } bg-transparent`}
@@ -151,13 +214,13 @@ export function Navigation() {
                   </Link>
                   <div className="flex items-center justify-between w-full px-3 py-2">
                     <span className="text-sm text-muted-foreground">
-                      Welcome, {user?.username}
+                      Welcome, {userEmail?.split('@')[0]}
                     </span>
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={() => {
-                        logout()
+                        handleLogout()
                         closeMobileMenu()
                       }}
                       className="text-foreground hover:text-red-400"
@@ -169,25 +232,13 @@ export function Navigation() {
               )}
 
               {!isAuthenticated && (
-                <Link href={userMode === "listener" ? "/listener/register" : "/artist/register"} onClick={closeMobileMenu}>
+                <Link href="/listener/register" onClick={closeMobileMenu}>
                   <Button
                     variant="outline"
-                    className={`w-full justify-start ${userMode === "listener"
-                      ? "border-cyber-purple text-cyber-purple hover:bg-cyber-purple hover:text-black glow-purple bg-transparent"
-                      : "border-cyber-pink text-cyber-pink hover:bg-cyber-pink hover:text-black glow-pink bg-transparent"
-                      }`}
+                    className="w-full justify-start border-cyber-purple text-cyber-purple hover:bg-cyber-purple hover:text-black glow-purple bg-transparent"
                   >
-                    {userMode === "listener" ? (
-                      <>
-                        <User className="h-4 w-4 mr-2" />
-                        Ingresa como Listener
-                      </>
-                    ) : (
-                      <>
-                        <Mic className="h-4 w-4 mr-2" />
-                        Ingresa como Artista
-                      </>
-                    )}
+                    <User className="h-4 w-4 mr-2" />
+                    Login
                   </Button>
                 </Link>
               )}
