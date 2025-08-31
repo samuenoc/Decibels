@@ -10,7 +10,7 @@ import { Suspense } from "react"
 import "./globals.css"
 
 export const metadata: Metadata = {
-  title: "CyberBeats - Decentralized Music Platform",
+  title: "Decibels - Decentralized Music Platform",
   description: "A cyberpunk-themed decentralized music streaming platform",
   generator: "v0.app",
 }
